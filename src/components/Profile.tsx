@@ -1,203 +1,207 @@
+"use client"
+
 import { useState } from 'react'
-import AppShell, { type AppView } from './shared/AppShell'
-
-const imgMe = 'http://localhost:3845/assets/f8f64cf3a1b2c3d4e5f6a7b8c9d0e1f2.png'
-
-interface ProfileProps {
-  activeView: AppView
-  onNavigate: (v: AppView) => void
-  onLogout: () => void
-}
+import { UilBell, UilChartLine, UilFire, UilMusic, UilShieldCheck, UilStar, UilUser } from '@iconscout/react-unicons'
+import AppShell from './shared/AppShell'
 
 const topArtists = [
-  { name: 'M83',             genre: 'Synthwave',   plays: 348 },
-  { name: 'Tame Impala',     genre: 'Psychedelic', plays: 290 },
-  { name: 'Bon Iver',        genre: 'Folk',        plays: 241 },
-  { name: 'Radiohead',       genre: 'Alt Rock',    plays: 198 },
-  { name: 'The National',    genre: 'Indie Rock',  plays: 177 },
-  { name: 'Sigur Rós',       genre: 'Post-rock',   plays: 153 },
+  { name: 'M83', genre: 'Synthwave', plays: 348 },
+  { name: 'Tame Impala', genre: 'Psychedelic', plays: 290 },
+  { name: 'Bon Iver', genre: 'Folk', plays: 241 },
+  { name: 'Radiohead', genre: 'Alt Rock', plays: 198 },
+  { name: 'The National', genre: 'Indie Rock', plays: 177 },
 ]
 
 const recentTracks = [
-  { title: 'Midnight City',    artist: 'M83',          time: 'Hace 5 min' },
-  { title: 'Let It Happen',    artist: 'Tame Impala',  time: 'Hace 22 min' },
-  { title: 'Holocene',         artist: 'Bon Iver',     time: 'Hace 1h' },
+  { title: 'Midnight City', artist: 'M83', time: 'Hace 5 min' },
+  { title: 'Let It Happen', artist: 'Tame Impala', time: 'Hace 22 min' },
+  { title: 'Holocene', artist: 'Bon Iver', time: 'Hace 1h' },
   { title: 'Fake Plastic Trees', artist: 'Radiohead', time: 'Hace 2h' },
-  { title: 'Bloodbuzz Ohio',   artist: 'The National', time: 'Hace 3h' },
 ]
 
 const badges = [
-  { icon: '🎵', label: 'Oyente compulsivo',  desc: '+1000h escuchadas' },
-  { icon: '👥', label: 'Twin Finder',         desc: '5+ matches perfectos' },
-  { icon: '🌙', label: 'Noctámbulo',          desc: 'Escucha después de las 2am' },
-  { icon: '🔥', label: 'Racha de 30 días',    desc: '30 días consecutivos' },
+  { icon: UilMusic, label: 'Oyente compulsivo', desc: '+1000h escuchadas' },
+  { icon: UilStar, label: 'Twin Finder', desc: '5+ matches perfectos' },
+  { icon: UilFire, label: 'Racha de 30 dias', desc: '30 dias consecutivos' },
+  { icon: UilShieldCheck, label: 'Perfil verificado', desc: 'Actividad saludable' },
 ]
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="bg-[#141418] border border-[#2a2a35] rounded-2xl p-4 text-center">
-      <p className="text-2xl font-bold text-slate-100 mb-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        {value}
-      </p>
-      <p className="text-xs text-slate-400">{label}</p>
-      {sub && <p className="text-xs text-purple-400 mt-1">{sub}</p>}
+    <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-4">
+      <p className="font-display text-2xl font-black text-white">{value}</p>
+      <p className="text-xs uppercase tracking-[0.12em] text-slate-300/65">{label}</p>
+      {sub && <p className="mt-1 text-xs text-[#e5be85]">{sub}</p>}
     </div>
   )
 }
 
-export default function Profile({ activeView, onNavigate, onLogout }: ProfileProps) {
+function ToggleRow({
+  label,
+  description,
+  value,
+  onChange,
+}: {
+  label: string
+  description: string
+  value: boolean
+  onChange: (value: boolean) => void
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3">
+      <div>
+        <p className="text-sm font-medium text-slate-100">{label}</p>
+        <p className="text-xs text-slate-300/65">{description}</p>
+      </div>
+      <button
+        onClick={() => onChange(!value)}
+        aria-pressed={value}
+        className={`relative h-6 w-11 rounded-full transition-colors ${value ? 'bg-[#d4a259]' : 'bg-white/20'}`}
+      >
+        <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+      </button>
+    </div>
+  )
+}
+
+export default function Profile() {
   const [notifEnabled, setNotifEnabled] = useState(true)
   const [shareEnabled, setShareEnabled] = useState(true)
   const [publicProfile, setPublicProfile] = useState(true)
 
   return (
-    <AppShell activeView={activeView} onNavigate={onNavigate} onLogout={onLogout}>
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <AppShell>
+      <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 md:px-6 md:py-8">
+        <section className="rounded-3xl border border-white/12 bg-slate-950/35 p-5 md:p-6">
+          <div className="flex flex-wrap items-start gap-4">
+            <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-[#781635]/70 to-[#d4a259]/35 text-white">
+              <UilUser size={34} />
+            </div>
+            <div className="min-w-[250px] flex-1">
+              <h1 className="font-display text-3xl font-black text-white">Luis Navarro</h1>
+              <p className="text-sm text-slate-300/75">@luisnavarro · Guadalajara, MX</p>
 
-        {/* Profile header */}
-        <div className="bg-[#141418] border border-[#2a2a35] rounded-2xl p-6 animate-fade-in-up">
-          <div className="flex items-start gap-5">
-            <div className="relative">
-              <img
-                src={imgMe} alt="Mi perfil"
-                className="w-20 h-20 rounded-2xl object-cover bg-[#2a2a35] animate-glow-pulse"
-                onError={e => {
-                  (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=Luis+N&background=1e1e2e&color=a855f7&size=80'
-                }}
-              />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-400 border-2 border-[#141418] flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-white" />
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[#e7b18f]/30 bg-[#781635]/30 px-3 py-1 text-xs text-[#f7e2d5]">Oyente premium</span>
+                <span className="rounded-full border border-[#d4a259]/30 bg-[#d4a259]/25 px-3 py-1 text-xs text-[#f2dec2]">Nivel 12</span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-200/80">
+                <span><strong className="text-white">47</strong> amigos</span>
+                <span><strong className="text-white">12</strong> twins</span>
+                <span><strong className="text-white">823</strong> canciones compartidas</span>
               </div>
             </div>
-            <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-100 mb-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Luis Navarro
-                  </h2>
-                  <p className="text-sm text-slate-400 mb-2">@luisnavarro · Guadalajara, MX</p>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-full text-xs bg-purple-500/15 text-purple-300 border border-purple-500/25 font-medium">
-                      🎵 Oyente Premium
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full text-xs bg-[#1e293b] text-slate-400 border border-[#2a2a35]">
-                      Nivel 12
-                    </span>
-                  </div>
-                </div>
-                <button className="px-4 py-2 rounded-xl bg-[#1e293b] hover:bg-[#2a3444] text-slate-300 text-sm font-medium transition-colors border border-[#2a2a35]">
-                  Editar perfil
-                </button>
-              </div>
-              <div className="flex gap-4 mt-3 text-sm text-slate-400">
-                <span><strong className="text-slate-200">47</strong> amigos</span>
-                <span><strong className="text-slate-200">12</strong> twins</span>
-                <span><strong className="text-slate-200">823</strong> canciones compartidas</span>
-              </div>
-            </div>
+
+            <button className="rounded-2xl border border-white/20 px-4 py-2 text-sm text-slate-100 transition-colors hover:bg-white/10">
+              Editar perfil
+            </button>
           </div>
-        </div>
+        </section>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 animate-fade-in-up stagger-2">
-          <StatCard label="Horas escuchadas" value="1,248h" sub="Este año" />
-          <StatCard label="Twin matches"     value="12"     sub="3 nuevos" />
-          <StatCard label="Género favorito"  value="Indie"  />
-          <StatCard label="Streak actual"    value="30 🔥"  sub="días" />
-        </div>
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard label="Horas escuchadas" value="1,248h" sub="Este ano" />
+          <StatCard label="Twin matches" value="12" sub="3 nuevos" />
+          <StatCard label="Genero favorito" value="Indie" />
+          <StatCard label="Streak" value="30" sub="dias" />
+        </section>
 
-        <div className="grid grid-cols-2 gap-6">
-          {/* Top artists */}
-          <div className="bg-[#141418] border border-[#2a2a35] rounded-2xl p-5 animate-fade-in-up stagger-3">
-            <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Top Artistas</h3>
-            <div className="space-y-3">
-              {topArtists.map((a, i) => (
-                <div key={a.name} className={`flex items-center gap-3 animate-fade-in-up`} style={{ animationDelay: `${i * 0.05}s` }}>
-                  <span className="w-5 text-xs text-slate-600 text-right flex-shrink-0 font-mono">
-                    {i + 1}
+        <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+            <div className="mb-4 inline-flex items-center gap-2 text-[#f0b7a9]">
+              <UilChartLine size={16} />
+              <p className="text-xs uppercase tracking-[0.16em]">Top artistas</p>
+            </div>
+
+            <div className="space-y-2.5">
+              {topArtists.map((artist, index) => (
+                <div key={artist.name} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+                  <span className="w-5 text-right text-xs text-slate-300/65">{index + 1}</span>
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#781635]/30 to-[#d4a259]/30 text-xs font-bold text-white">
+                    {artist.name[0]}
                   </span>
-                  <div
-                    className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center text-lg font-bold bg-gradient-to-br from-purple-900 to-slate-900"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                  >
-                    {a.name[0]}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-white">{artist.name}</p>
+                    <p className="text-xs text-slate-300/65">{artist.genre}</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-200 truncate">{a.name}</p>
-                    <p className="text-xs text-slate-500">{a.genre}</p>
-                  </div>
-                  <span className="text-xs text-slate-600 flex-shrink-0">{a.plays}</span>
+                  <span className="text-xs text-slate-200/75">{artist.plays}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </article>
 
-          {/* Right column: Recent + Badges */}
-          <div className="space-y-5">
-            {/* Recent tracks */}
-            <div className="bg-[#141418] border border-[#2a2a35] rounded-2xl p-5 animate-fade-in-up stagger-4">
-              <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Escuchado recientemente</h3>
+          <div className="space-y-4">
+            <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+              <div className="mb-4 inline-flex items-center gap-2 text-[#e5be85]">
+                <UilMusic size={16} />
+                <p className="text-xs uppercase tracking-[0.16em]">Reciente</p>
+              </div>
               <div className="space-y-2.5">
-                {recentTracks.map((t, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-900 to-slate-900 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3.5 h-3.5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                      </svg>
+                {recentTracks.map(track => (
+                  <div key={track.title} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+                    <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#781635]/35 text-[#f7e2d5]">
+                      <UilMusic size={14} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-white">{track.title}</p>
+                      <p className="text-xs text-slate-300/65">{track.artist}</p>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-slate-200 truncate">{t.title}</p>
-                      <p className="text-xs text-slate-600">{t.artist}</p>
-                    </div>
-                    <span className="text-xs text-slate-600 flex-shrink-0">{t.time}</span>
+                    <span className="text-xs text-slate-300/65">{track.time}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </article>
 
-            {/* Badges */}
-            <div className="bg-[#141418] border border-[#2a2a35] rounded-2xl p-5 animate-fade-in-up stagger-5">
-              <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Insignias</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {badges.map(b => (
-                  <div key={b.label} className="bg-[#1a1a22] rounded-xl p-3 border border-[#2a2a35]">
-                    <div className="text-2xl mb-1">{b.icon}</div>
-                    <p className="text-xs font-semibold text-slate-200">{b.label}</p>
-                    <p className="text-xs text-slate-600">{b.desc}</p>
-                  </div>
-                ))}
+            <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+              <div className="mb-4 inline-flex items-center gap-2 text-[#f2cab4]">
+                <UilStar size={16} />
+                <p className="text-xs uppercase tracking-[0.16em]">Insignias</p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Settings */}
-        <div className="bg-[#141418] border border-[#2a2a35] rounded-2xl p-5 animate-fade-in-up stagger-6">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Configuración</h3>
-          <div className="divide-y divide-[#2a2a35]">
-            {[
-              { label: 'Notificaciones de nuevos twins', sub: 'Recibe alertas cuando encuentres una coincidencia', value: notifEnabled, set: setNotifEnabled },
-              { label: 'Compartir historial de escucha', sub: 'Tus amigos pueden ver qué estás escuchando', value: shareEnabled, set: setShareEnabled },
-              { label: 'Perfil público',                 sub: 'Cualquier usuario puede ver tu perfil',         value: publicProfile, set: setPublicProfile },
-            ].map(s => (
-              <div key={s.label} className="flex items-center justify-between py-4">
-                <div>
-                  <p className="text-sm text-slate-200 font-medium">{s.label}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{s.sub}</p>
-                </div>
-                <button
-                  onClick={() => s.set(v => !v)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${s.value ? 'bg-purple-600' : 'bg-[#2a2a35]'}`}
-                >
-                  <span
-                    className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${s.value ? 'translate-x-6' : 'translate-x-1'}`}
-                  />
-                </button>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {badges.map(badge => {
+                  const Icon = badge.icon
+                  return (
+                    <div key={badge.label} className="rounded-2xl border border-white/12 bg-white/5 p-3">
+                      <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#781635]/30 to-[#d4a259]/30 text-[#f7e2d5]">
+                        <Icon size={15} />
+                      </span>
+                      <p className="text-xs font-semibold text-white">{badge.label}</p>
+                      <p className="text-xs text-slate-300/65">{badge.desc}</p>
+                    </div>
+                  )
+                })}
               </div>
-            ))}
+            </article>
           </div>
-        </div>
+        </section>
 
+        <section className="rounded-3xl border border-white/12 bg-slate-950/35 p-5">
+          <div className="mb-3 inline-flex items-center gap-2 text-amber-200">
+            <UilBell size={16} />
+            <p className="text-xs uppercase tracking-[0.16em]">Configuracion</p>
+          </div>
+
+          <div className="divide-y divide-white/10">
+            <ToggleRow
+              label="Notificaciones de nuevos twins"
+              description="Recibe alertas cuando aparezcan coincidencias relevantes"
+              value={notifEnabled}
+              onChange={setNotifEnabled}
+            />
+            <ToggleRow
+              label="Compartir historial de escucha"
+              description="Tus amigos pueden ver tu actividad reciente"
+              value={shareEnabled}
+              onChange={setShareEnabled}
+            />
+            <ToggleRow
+              label="Perfil publico"
+              description="Cualquier usuario puede descubrir tu perfil musical"
+              value={publicProfile}
+              onChange={setPublicProfile}
+            />
+          </div>
+        </section>
       </div>
     </AppShell>
   )

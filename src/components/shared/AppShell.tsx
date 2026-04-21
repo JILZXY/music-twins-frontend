@@ -75,6 +75,7 @@ export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname()
   const router = useRouter()
   const activeView = pathnameToView(pathname)
+  const { user } = useAuthStore()
   const [nowPlaying, setNowPlaying] = useState<any>(null)
 
   useEffect(() => {
@@ -105,14 +106,30 @@ export default function AppShell({ children }: AppShellProps) {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1500px] pb-20 md:pb-0">
         <aside className="hidden w-72 shrink-0 border-r border-white/10 bg-white/5 backdrop-blur-xl md:flex md:flex-col">
-          <div className="flex items-center gap-3 border-b border-white/10 px-6 py-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-[#22d3ee] to-[#67e8f9] text-slate-100 shadow-[0_0_24px_rgba(103, 232, 249,0.4)]">
-              <UilHeadphones size={20} />
+          <div className="flex flex-col gap-4 border-b border-white/10 px-6 py-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-[#22d3ee] to-[#67e8f9] text-slate-100 shadow-[0_0_24px_rgba(103, 232, 249,0.4)]">
+                <UilHeadphones size={20} />
+              </div>
+              <div>
+                <p className="font-display text-2xl font-semibold tracking-[0.08em]">MusicTwins</p>
+                <p className="text-[11px] uppercase tracking-[0.25em] text-[#67e8f9]/80">Audio Society</p>
+              </div>
             </div>
-            <div>
-              <p className="font-display text-2xl font-semibold tracking-[0.08em]">MusicTwins</p>
-              <p className="text-[11px] uppercase tracking-[0.25em] text-[#67e8f9]/80">Audio Society</p>
-            </div>
+
+            {/* User Profile Hook */}
+            {user && (
+              <div className="mt-2 flex items-center gap-3 rounded-2xl bg-white/5 p-3 outline outline-1 outline-white/10">
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="Avatar" className="h-9 w-9 rounded-full object-cover shadow-md" />
+                ) : (
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[#22d3ee]/60 to-[#67e8f9]/35 text-xs font-bold text-white">
+                    {(user.displayName || 'U').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <p className="truncate text-sm font-semibold text-white">{user.displayName || 'Twin User'}</p>
+              </div>
+            )}
           </div>
 
           <nav className="flex-1 space-y-1 px-4 py-4">

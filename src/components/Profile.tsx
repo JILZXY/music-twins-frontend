@@ -71,7 +71,7 @@ export default function Profile() {
   const [publicProfile, setPublicProfile] = useState(true)
   const { user } = useAuthStore()
 
-  const displayName = user?.username || 'Luis Navarro'
+  const displayName = user?.displayName || 'Luis Navarro'
   const initial = displayName.charAt(0).toUpperCase()
 
   return (
@@ -79,12 +79,16 @@ export default function Profile() {
       <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 md:px-6 md:py-8">
         <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5 md:p-6">
           <div className="flex flex-wrap items-start gap-4">
-            <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-[#22d3ee]/70 to-[#67e8f9]/35 text-white font-display text-3xl font-bold">
-              {initial}
-            </div>
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" className="h-20 w-20 rounded-3xl object-cover shadow-[0_10px_20px_rgba(0,0,0,0.3)]" />
+            ) : (
+              <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-[#22d3ee]/70 to-[#67e8f9]/35 text-white font-display text-3xl font-bold">
+                {initial}
+              </div>
+            )}
             <div className="min-w-[250px] flex-1">
               <h1 className="font-display text-3xl font-black text-white">{displayName}</h1>
-              <p className="text-sm text-slate-300/75">@{user?.username?.toLowerCase() || 'luisnavarro'} · Mexico</p>
+              <p className="text-sm text-slate-300/75">{user?.email || '@luisnavarro'} · Spotify Linked</p>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 <span className="rounded-full border border-[#ff8d89]/30 bg-[#22d3ee]/30 px-3 py-1 text-xs text-[#fff8ef]">Oyente premium</span>

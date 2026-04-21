@@ -1,9 +1,12 @@
 export interface User {
-  id: number;
-  email?: string;
-  username: string;
-  spotifyId?: string;
-  avatar?: string;
+  id: number | string;
+  spotifyId: string;
+  displayName: string;
+  email: string | null;
+  avatarUrl: string | null;
+  username?: string; // retrocompatibility
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export interface AuthSession {

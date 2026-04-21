@@ -102,7 +102,7 @@ function BreakdownBar({ label, score }: { label: string; score: number }) {
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#781635] via-[#e4504a] to-[#d4a259]"
+          className="h-full rounded-full bg-gradient-to-r from-[#22d3ee] via-[#ff8d89] to-[#67e8f9]"
           style={{ width: `${score}%` }}
         />
       </div>
@@ -119,7 +119,7 @@ function InitialTwin({ name }: { name: string }) {
     .toUpperCase()
 
   return (
-    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#781635]/70 to-[#d4a259]/35 font-display text-sm font-bold text-white">
+    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#22d3ee]/70 to-[#67e8f9]/35 font-display text-sm font-bold text-white">
       {initials}
     </span>
   )
@@ -132,8 +132,8 @@ export default function TwinMatch() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 md:px-6 md:py-8">
-        <header className="rounded-3xl border border-white/12 bg-white/[0.04] p-5 md:p-6">
-          <p className="text-xs uppercase tracking-[0.18em] text-[#f2cab4]">Twin intelligence</p>
+        <header className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5 md:p-6">
+          <p className="text-xs uppercase tracking-[0.18em] text-[#67e8f9]">Twin intelligence</p>
           <h1 className="mt-2 font-display text-3xl font-black text-white md:text-4xl">Compatibilidad musical avanzada</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-200/75 md:text-base">
             El motor Twin cruza ritmo, mood, epoca y repeticion para encontrar conexiones reales entre perfiles de escucha.
@@ -141,14 +141,14 @@ export default function TwinMatch() {
         </header>
 
         <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <aside className="space-y-3 rounded-3xl border border-white/12 bg-white/[0.04] p-4">
+          <aside className="space-y-3 rounded-3xl border border-white/12 bg-[#25252a]/70 p-4">
             {twins.map(twin => (
               <button
                 key={twin.id}
                 onClick={() => setSelected(twin)}
                 className={`w-full rounded-2xl border p-3 text-left transition-colors ${
                   selected.id === twin.id
-                    ? 'border-[#e7b18f]/35 bg-[#781635]/30'
+                    ? 'border-[#ff8d89]/35 bg-[#22d3ee]/30'
                     : 'border-white/12 bg-white/4 hover:bg-white/10'
                 }`}
               >
@@ -165,7 +165,7 @@ export default function TwinMatch() {
           </aside>
 
           <section className="space-y-4">
-            <article className="rounded-3xl border border-white/12 bg-slate-950/35 p-5 md:p-6">
+            <article className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5 md:p-6">
               <div className="flex flex-wrap items-center gap-5">
                 <ScoreRing score={selected.score} />
                 <div className="min-w-[240px] flex-1">
@@ -175,7 +175,7 @@ export default function TwinMatch() {
                   </p>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <button className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#781635] to-[#e4504a] px-4 py-2 text-sm font-semibold text-white">
+                    <button className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#22d3ee] to-[#ff8d89] px-4 py-2 text-sm font-semibold text-white">
                       <UilHeadphonesAlt size={16} />
                       Escuchar juntos
                     </button>
@@ -197,7 +197,7 @@ export default function TwinMatch() {
               </div>
             </article>
 
-            <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+            <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
               <div className="mb-4 inline-flex items-center gap-2 text-[#f0b7a9]">
                 <UilChartGrowth size={16} />
                 <p className="text-xs uppercase tracking-[0.16em]">Generos en comun</p>
@@ -211,7 +211,7 @@ export default function TwinMatch() {
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-white/10">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#781635] to-[#d4a259]"
+                        className="h-full rounded-full bg-gradient-to-r from-[#22d3ee] to-[#67e8f9]"
                         style={{ width: `${genre.pct}%` }}
                       />
                     </div>
@@ -220,7 +220,7 @@ export default function TwinMatch() {
               </div>
             </article>
 
-            <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+            <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
               <div className="mb-4 inline-flex items-center gap-2 text-[#e5be85]">
                 <UilUsersAlt size={16} />
                 <p className="text-xs uppercase tracking-[0.16em]">Artistas compartidos</p>

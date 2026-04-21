@@ -42,3 +42,20 @@ export const PlayerService = {
     return fetchWithAuth('/spotify/now-playing');
   }
 };
+
+export const MessageService = {
+  getConversations: (): Promise<any[]> => {
+    return fetchWithAuth('/conversations');
+  },
+  
+  getMessages: (conversationId: string): Promise<any[]> => {
+    return fetchWithAuth(`/conversations/${conversationId}/messages`);
+  },
+
+  markAsRead: (messageIds: string[]): Promise<any> => {
+    return fetchWithAuth('/messages/read', {
+      method: 'POST',
+      body: JSON.stringify({ messageIds })
+    });
+  }
+};

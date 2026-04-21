@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   UilLocationArrow,
@@ -11,11 +11,14 @@ import {
   UilUserCircle,
 } from '@iconscout/react-unicons'
 import AppShell from './shared/AppShell'
+import { MessageService } from '../services/api'
+import { socketService } from '../services/socket'
+import { useAuthStore } from '../services/store'
 
 type MsgType = 'text' | 'song'
 
 interface Message {
-  id: number
+  id: number | string
   from: 'me' | 'them'
   type: MsgType
   text?: string
@@ -24,52 +27,14 @@ interface Message {
 }
 
 interface Conversation {
-  id: number
+  id: number | string
   name: string
   online: boolean
   lastMsg: string
   time: string
   unread: number
-  messages: Message[]
+  messages?: Message[]
 }
-
-const initialConversations: Conversation[] = [
-  {
-    id: 1,
-    name: 'Alex Rivera',
-    online: true,
-    lastMsg: 'Escucha esta version de M83',
-    time: '2m',
-    unread: 2,
-    messages: [
-      { id: 1, from: 'them', type: 'text', text: 'Oye, vi tu feed de hoy', time: '12:30' },
-      { id: 2, from: 'me', type: 'text', text: 'Fue una buena sesion nocturna', time: '12:31' },
-      { id: 3, from: 'them', type: 'song', song: { title: 'Midnight City', artist: 'M83' }, time: '12:32' },
-      { id: 4, from: 'them', type: 'text', text: 'Escucha esta version de M83', time: '12:33' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Sarah Chen',
-    online: false,
-    lastMsg: 'Me encanto ese track',
-    time: '1h',
-    unread: 0,
-    messages: [
-      { id: 1, from: 'me', type: 'song', song: { title: 'Levitating', artist: 'Dua Lipa' }, time: '11:10' },
-      { id: 2, from: 'them', type: 'text', text: 'Me encanto ese track', time: '11:15' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Jordan Smith',
-    online: true,
-    lastMsg: 'Armemos un playlist juntos',
-    time: '3h',
-    unread: 1,
-    messages: [{ id: 1, from: 'them', type: 'text', text: 'Armemos un playlist juntos', time: '09:00' }],
-  },
-]
 
 function InitialBadge({ name, online, size = 'h-10 w-10' }: { name: string; online: boolean; size?: string }) {
   const initials = name
@@ -81,18 +46,18 @@ function InitialBadge({ name, online, size = 'h-10 w-10' }: { name: string; onli
 
   return (
     <div className="relative shrink-0">
-      <div className={`grid ${size} place-items-center rounded-2xl bg-gradient-to-br from-[#781635]/60 to-[#d4a259]/35 font-display text-xs font-bold text-white`}>
+      <div className={`grid ${size} place-items-center rounded-2xl bg-gradient-to-br from-[#22d3ee]/60 to-[#67e8f9]/35 font-display text-xs font-bold text-white`}>
         {initials}
       </div>
-      {online && <span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-slate-950 bg-[#d4a259]" />}
+      {online && <span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-slate-950 bg-[#67e8f9]" />}
     </div>
   )
 }
 
 function SongCard({ song }: { song: NonNullable<Message['song']> }) {
   return (
-    <div className="flex max-w-[260px] items-center gap-2 rounded-2xl border border-[#e7b18f]/25 bg-[#781635]/25 p-3">
-      <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#781635]/35 text-[#f7e2d5]">
+    <div className="flex max-w-[260px] items-center gap-2 rounded-2xl border border-[#ff8d89]/25 bg-[#22d3ee]/25 p-3">
+      <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#22d3ee]/35 text-[#fff8ef]">
         <UilMusic size={16} />
       </span>
       <div className="min-w-0 flex-1">
@@ -107,22 +72,121 @@ function SongCard({ song }: { song: NonNullable<Message['song']> }) {
 }
 
 export default function Messages() {
-  const [conversations, setConversations] = useState(initialConversations)
-  const [activeConvId, setActiveConvId] = useState(initialConversations[0].id)
+  const { user } = useAuthStore()
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [activeConvId, setActiveConvId] = useState<string | number | null>(null)
+  const [activeMessages, setActiveMessages] = useState<Message[]>([])
   const [query, setQuery] = useState('')
   const [input, setInput] = useState('')
   const router = useRouter()
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // 1. Fetch Conversations on Mount
+  useEffect(() => {
+    async function fetchList() {
+      try {
+        const res = await MessageService.getConversations()
+        
+        // Defensive mapping to ensure our UI struct is populated
+        const mapped = res.map((c: any, index) => ({
+          id: c.id || c._id || index.toString(),
+          name: c.friendName || c.name || `Usuario ${index}`,
+          online: c.online !== undefined ? c.online : true,
+          lastMsg: c.lastMessage || c.lastMsg || '...',
+          time: c.time || 'reciente',
+          unread: c.unreadCount || c.unread || 0,
+        }))
+        setConversations(mapped)
+        if (mapped.length > 0 && !activeConvId) {
+          setActiveConvId(mapped[0].id)
+        }
+      } catch (err) {
+        console.error("Error al obtener conversaciones", err)
+      }
+    }
+    fetchList()
+  }, [])
+
+  // 2. Load Messages when Active Conversation switches
+  useEffect(() => {
+    if (!activeConvId) return
+
+    async function loadThread() {
+      try {
+        const res = await MessageService.getMessages(String(activeConvId))
+        const mapped = res.map((m: any) => ({
+          id: m.id || m._id || Date.now() + Math.random(),
+          from: (m.senderId === user?.id || m.isMine) ? 'me' : 'them',
+          type: m.song ? 'song' : 'text',
+          text: m.text || m.content || '',
+          song: m.song,
+          time: m.time || m.timestamp || new Date().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'}),
+        })) as Message[]
+        
+        setActiveMessages(mapped)
+        MessageService.markAsRead(mapped.filter(m => m.from === 'them').map(m => String(m.id))).catch(() => {})
+        
+        // Remove unread bubble
+        setConversations(prev => prev.map(c => c.id === activeConvId ? { ...c, unread: 0 } : c))
+      } catch (err) {
+        console.error("Error en hilo de chat", err)
+        setActiveMessages([])
+      }
+    }
+    loadThread()
+  }, [activeConvId, user?.id])
+
+  // 3. Setup WebSockets
+  useEffect(() => {
+    const socket = socketService.connect()
+    
+    const handleReceive = (data: any) => {
+      // Validate correct format based on fallback
+      const convId = data.conversationId || data.threadId || null
+      const incomingMsg: Message = {
+        id: data.id || Date.now(),
+        from: (data.senderId === user?.id) ? 'me' : 'them',
+        type: data.song ? 'song' : 'text',
+        text: data.text || data.content || '',
+        time: new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })
+      }
+
+      // If it belongs to active chat, push it and read it
+      if (String(convId) === String(activeConvId) || !convId) {
+         setActiveMessages(prev => [...prev, incomingMsg])
+         if (incomingMsg.from === 'them') {
+            MessageService.markAsRead([String(incomingMsg.id)]).catch(()=>{});
+         }
+      } else {
+         // Add unread badge to others
+         setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread: c.unread + 1, lastMsg: incomingMsg.text || 'Nuevo msg' } : c))
+      }
+    }
+
+    socket.on('MESSAGE_RECEIVED', handleReceive)
+
+    return () => {
+      socket.off('MESSAGE_RECEIVED', handleReceive)
+    }
+  }, [activeConvId, user?.id])
+
+  // Scroll bottom on new messages
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [activeMessages])
+
 
   const filteredConversations = useMemo(
     () => conversations.filter(item => item.name.toLowerCase().includes(query.trim().toLowerCase())),
     [conversations, query],
   )
 
-  const activeConversation =
-    conversations.find(item => item.id === activeConvId) ?? conversations[0]
+  const activeConversation = conversations.find(item => item.id === activeConvId) || null
 
   function sendMessage() {
-    if (!input.trim()) return
+    if (!input.trim() || !activeConvId) return
 
     const newMessage: Message = {
       id: Date.now(),
@@ -132,18 +196,18 @@ export default function Messages() {
       time: new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }),
     }
 
-    setConversations(prev =>
-      prev.map(item =>
-        item.id === activeConversation.id
-          ? {
-              ...item,
-              messages: [...item.messages, newMessage],
-              lastMsg: newMessage.text ?? '',
-              time: 'ahora',
-            }
-          : item,
-      ),
-    )
+    // Optimistic UI update
+    setActiveMessages(prev => [...prev, newMessage])
+    
+    // Send via socket
+    const socket = socketService.getSocket()
+    if (socket) {
+      socket.emit('MESSAGE_SEND', {
+        conversationId: activeConvId,
+        text: input.trim(),
+        senderId: user?.id
+      })
+    }
 
     setInput('')
   }
@@ -151,7 +215,7 @@ export default function Messages() {
   return (
     <AppShell>
       <div className="mx-auto grid h-full min-h-screen w-full max-w-6xl gap-4 px-4 py-5 md:px-6 md:py-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <aside className="rounded-3xl border border-white/12 bg-white/[0.04]">
+        <aside className="rounded-3xl border border-white/12 bg-[#25252a]/70">
           <div className="border-b border-white/10 p-4">
             <h1 className="font-display text-2xl font-black text-white">Mensajes</h1>
 
@@ -160,19 +224,20 @@ export default function Messages() {
               <input
                 value={query}
                 onChange={event => setQuery(event.target.value)}
-                className="w-full rounded-2xl border border-white/15 bg-white/5 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-400/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a259]"
+                className="w-full rounded-2xl border border-white/15 bg-white/5 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-400/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67e8f9]"
                 placeholder="Buscar conversacion"
               />
             </label>
           </div>
 
           <div className="max-h-[65vh] overflow-y-auto">
+            {filteredConversations.length === 0 && <p className="p-4 text-center text-sm text-slate-400">0 conversaciones encontradas</p>}
             {filteredConversations.map(conversation => (
               <button
                 key={conversation.id}
                 onClick={() => setActiveConvId(conversation.id)}
                 className={`flex w-full items-center gap-3 border-b border-white/5 p-4 text-left transition-colors ${
-                  conversation.id === activeConversation.id ? 'bg-white/10' : 'hover:bg-white/6'
+                  conversation.id === activeConvId ? 'bg-white/10' : 'hover:bg-white/6'
                 }`}
               >
                 <InitialBadge name={conversation.name} online={conversation.online} />
@@ -184,7 +249,7 @@ export default function Messages() {
                   <p className="truncate text-xs text-slate-300/75">{conversation.lastMsg}</p>
                 </div>
                 {conversation.unread > 0 && (
-                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#781635] px-1 text-[11px] font-semibold text-white">
+                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#22d3ee] px-1 text-[11px] font-semibold text-white">
                     {conversation.unread}
                   </span>
                 )}
@@ -193,65 +258,74 @@ export default function Messages() {
           </div>
         </aside>
 
-        <section className="flex min-h-[70vh] flex-col rounded-3xl border border-white/12 bg-slate-950/35">
-          <header className="flex items-center gap-3 border-b border-white/10 p-4">
-            <InitialBadge name={activeConversation.name} online={activeConversation.online} size="h-9 w-9" />
-            <div>
-              <p className="font-display text-lg font-bold text-white">{activeConversation.name}</p>
-              <p className="text-xs text-slate-300/65">{activeConversation.online ? 'En linea' : 'Desconectado'}</p>
-            </div>
-              <button className="ml-auto rounded-xl bg-white/10 p-2 text-slate-100" onClick={() => router.push('/feed')}>
-              <UilMessage size={16} />
-            </button>
-          </header>
-
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {activeConversation.messages.map(message => (
-              <div key={message.id} className={`flex ${message.from === 'me' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] ${message.from === 'me' ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                  {message.type === 'song' && message.song ? (
-                    <SongCard song={message.song} />
-                  ) : (
-                    <div
-                      className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                        message.from === 'me'
-                          ? 'rounded-tr-sm bg-gradient-to-r from-[#781635] to-[#e4504a] text-white'
-                          : 'rounded-tl-sm border border-white/15 bg-white/8 text-slate-100'
-                      }`}
-                    >
-                      {message.text}
-                    </div>
-                  )}
-                  <span className="text-[11px] uppercase tracking-[0.12em] text-slate-300/55">{message.time}</span>
+        <section className="flex min-h-[70vh] flex-col rounded-3xl border border-white/12 bg-[#1f1f23]/70">
+          {activeConversation ? (
+            <>
+              <header className="flex items-center gap-3 border-b border-white/10 p-4">
+                <InitialBadge name={activeConversation.name} online={activeConversation.online} size="h-9 w-9" />
+                <div>
+                  <p className="font-display text-lg font-bold text-white">{activeConversation.name}</p>
+                  <p className="text-xs text-slate-300/65">{activeConversation.online ? 'En linea' : 'Desconectado'}</p>
                 </div>
-              </div>
-            ))}
-          </div>
+                <button className="ml-auto rounded-xl bg-white/10 p-2 text-slate-100" onClick={() => router.push('/feed')}>
+                  <UilMessage size={16} />
+                </button>
+              </header>
 
-          <footer className="border-t border-white/10 p-4">
-            <div className="flex items-center gap-2">
-              <button className="rounded-xl bg-white/10 p-2 text-slate-100 transition-colors hover:bg-white/15" aria-label="Adjuntar pista">
-                <UilUserCircle size={18} />
-              </button>
-              <input
-                value={input}
-                onChange={event => setInput(event.target.value)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter') sendMessage()
-                }}
-                placeholder="Escribe un mensaje"
-                className="flex-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-slate-400/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a259]"
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim()}
-                className="inline-flex items-center gap-1 rounded-2xl bg-gradient-to-r from-[#781635] to-[#d4a259] px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <UilLocationArrow size={15} />
-                Enviar
-              </button>
+              <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
+                {activeMessages.length === 0 && <div className="text-center text-sm text-slate-500 mt-10">Comienza a chatear.</div>}
+                {activeMessages.map(message => (
+                  <div key={message.id} className={`flex ${message.from === 'me' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[75%] ${message.from === 'me' ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                      {message.type === 'song' && message.song ? (
+                        <SongCard song={message.song} />
+                      ) : (
+                        <div
+                          className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                            message.from === 'me'
+                              ? 'rounded-tr-sm bg-gradient-to-r from-[#22d3ee] to-[#ff8d89] text-white'
+                              : 'rounded-tl-sm border border-white/15 bg-white/8 text-slate-100'
+                          }`}
+                        >
+                          {message.text}
+                        </div>
+                      )}
+                      <span className="text-[11px] uppercase tracking-[0.12em] text-slate-300/55">{message.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <footer className="border-t border-white/10 p-4">
+                <div className="flex items-center gap-2">
+                  <button className="rounded-xl bg-white/10 p-2 text-slate-100 transition-colors hover:bg-white/15" aria-label="Adjuntar pista">
+                    <UilUserCircle size={18} />
+                  </button>
+                  <input
+                    value={input}
+                    onChange={event => setInput(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter') sendMessage()
+                    }}
+                    placeholder="Escribe un mensaje"
+                    className="flex-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-slate-400/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67e8f9]"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim()}
+                    className="inline-flex items-center gap-1 rounded-2xl bg-[#ff8d89] px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <UilLocationArrow size={15} />
+                    Enviar
+                  </button>
+                </div>
+              </footer>
+            </>
+          ) : (
+            <div className="flex flex-1 items-center justify-center p-10 text-center text-slate-400">
+               <p>No tienes conversaciones activas.<br/>Busca nuevos gemelos musicales en tu feed.</p>
             </div>
-          </footer>
+          )}
         </section>
       </div>
     </AppShell>

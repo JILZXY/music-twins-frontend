@@ -5,14 +5,14 @@
 @tailwind utilities;
 
 :root {
-  --app-bg: #111111;
+  --app-bg: #0e0e11;
   --app-panel: rgba(255, 255, 255, 0.04);
   --app-border: rgba(255, 255, 255, 0.12);
-  --app-text: #f5efe6;
+  --app-text: #fff8ef;
   --app-muted: rgba(226, 232, 240, 0.72);
-  --accent-primary: #e4504a;
-  --accent-secondary: #c79858;
-  --accent-deep: #781635;
+  --accent-primary: #ff8d89;
+  --accent-secondary: #67e8f9;
+  --accent-deep: #22d3ee;
 }
 
 * {
@@ -47,10 +47,10 @@ a {
 
 .bg-app-background {
   background:
-    radial-gradient(circle at 12% 18%, rgba(120, 22, 53, 0.35), transparent 34%),
-    radial-gradient(circle at 85% 12%, rgba(228, 80, 74, 0.22), transparent 32%),
-    radial-gradient(circle at 52% 92%, rgba(199, 152, 88, 0.2), transparent 38%),
-    linear-gradient(145deg, #111111 0%, #18120f 55%, #1f1512 100%);
+    radial-gradient(circle at 12% 18%, rgba(34, 211, 238, 0.35), transparent 34%),
+    radial-gradient(circle at 85% 12%, rgba(255, 141, 137, 0.22), transparent 32%),
+    radial-gradient(circle at 52% 92%, rgba(103, 232, 249, 0.2), transparent 38%),
+    linear-gradient(145deg, #0e0e11 0%, #1f1f23 55%, #131316 100%);
 }
 
 .wave-pill {
@@ -115,15 +115,15 @@ a {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 9999px;
-  background: rgba(228, 80, 74, 0.45);
+  background: rgba(255, 141, 137, 0.45);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(228, 80, 74, 0.7);
+  background: rgba(255, 141, 137, 0.7);
 }
 
 :focus-visible {
-  outline: 2px solid rgba(199, 152, 88, 0.95);
+  outline: 2px solid rgba(103, 232, 249, 0.95);
   outline-offset: 2px;
 }
 

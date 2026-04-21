@@ -38,7 +38,7 @@ function NavItem({ icon: Icon, label, active, onClick }: NavItemProps) {
       <Icon size={18} className={`transition-opacity ${active ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'}`} />
       <span>{label}</span>
       {active && (
-        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#d4a259] animate-pulse" />
+        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#67e8f9] animate-pulse" />
       )}
     </button>
   )
@@ -86,18 +86,18 @@ export default function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-app-background text-slate-100">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(120,22,53,0.32),transparent_34%),radial-gradient(circle_at_80%_25%,rgba(228,80,74,0.22),transparent_28%),radial-gradient(circle_at_50%_100%,rgba(199,152,88,0.2),transparent_35%)]" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#0e0e11] text-[#fff8ef] text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(103, 232, 249,0.32),transparent_34%),radial-gradient(circle_at_80%_25%,rgba(255, 141, 137,0.22),transparent_28%),radial-gradient(circle_at_50%_100%,rgba(103, 232, 249,0.2),transparent_35%)]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1500px] pb-20 md:pb-0">
         <aside className="hidden w-72 shrink-0 border-r border-white/10 bg-white/5 backdrop-blur-xl md:flex md:flex-col">
           <div className="flex items-center gap-3 border-b border-white/10 px-6 py-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-[#781635] to-[#d4a259] text-slate-100 shadow-[0_0_24px_rgba(120,22,53,0.4)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-[#22d3ee] to-[#67e8f9] text-slate-100 shadow-[0_0_24px_rgba(103, 232, 249,0.4)]">
               <UilHeadphones size={20} />
             </div>
             <div>
               <p className="font-display text-2xl font-semibold tracking-[0.08em]">MusicTwins</p>
-              <p className="text-[11px] uppercase tracking-[0.25em] text-[#f2cab4]/80">Audio Society</p>
+              <p className="text-[11px] uppercase tracking-[0.25em] text-[#67e8f9]/80">Audio Society</p>
             </div>
           </div>
 
@@ -113,7 +113,7 @@ export default function AppShell({ children }: AppShellProps) {
             ))}
           </nav>
 
-          <div className="mx-4 mb-4 rounded-md border border-[#d4a259]/25 bg-black/25 p-4">
+          <div className="mx-4 mb-4 rounded-md border border-[#67e8f9]/25 bg-black/25 p-4">
             <div className="mb-2 flex items-center gap-2 text-[#e5be85]">
               <UilMusic size={16} />
               <span className="text-xs uppercase tracking-[0.18em]">Escucha activa</span>
@@ -133,7 +133,7 @@ export default function AppShell({ children }: AppShellProps) {
                 AuthService.logout();
                 router.push('/');
               }}
-              className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3 py-2.5 text-sm text-slate-300/80 transition-all duration-200 hover:border-[#e4504a]/50 hover:bg-[#e4504a]/20 hover:text-[#ffd9cc]"
+              className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3 py-2.5 text-sm text-slate-300/80 transition-all duration-200 hover:border-[#ff8d89]/50 hover:bg-[#ff8d89]/20 hover:text-[#ffd9cc]"
             >
               <UilSignOutAlt size={18} />
               <span>Cerrar sesión</span>
@@ -142,8 +142,8 @@ export default function AppShell({ children }: AppShellProps) {
         </aside>
 
         <main className="relative flex-1 overflow-y-auto">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-56 bg-[linear-gradient(180deg,rgba(228,80,74,0.15),transparent)]" />
-          <p className="pointer-events-none absolute left-10 top-4 z-0 hidden select-none font-display text-8xl font-semibold tracking-[0.08em] text-[#f2cab4]/[0.08] md:block">
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-56 bg-[linear-gradient(180deg,rgba(255, 141, 137,0.15),transparent)]" />
+          <p className="pointer-events-none absolute left-10 top-4 z-0 hidden select-none font-display text-8xl font-semibold tracking-[0.08em] text-[#67e8f9]/[0.08] md:block">
             {viewHeadline[activeView]}
           </p>
           <div className="relative z-10">{children}</div>

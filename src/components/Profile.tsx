@@ -29,7 +29,7 @@ const badges = [
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-4">
+    <div className="rounded-2xl border border-white/12 bg-[#25252a]/70 p-4">
       <p className="font-display text-2xl font-black text-white">{value}</p>
       <p className="text-xs uppercase tracking-[0.12em] text-slate-300/65">{label}</p>
       {sub && <p className="mt-1 text-xs text-[#e5be85]">{sub}</p>}
@@ -57,7 +57,7 @@ function ToggleRow({
       <button
         onClick={() => onChange(!value)}
         aria-pressed={value}
-        className={`relative h-6 w-11 rounded-full transition-colors ${value ? 'bg-[#d4a259]' : 'bg-white/20'}`}
+        className={`relative h-6 w-11 rounded-full transition-colors ${value ? 'bg-[#67e8f9]' : 'bg-white/20'}`}
       >
         <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
       </button>
@@ -77,9 +77,9 @@ export default function Profile() {
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 md:px-6 md:py-8">
-        <section className="rounded-3xl border border-white/12 bg-slate-950/35 p-5 md:p-6">
+        <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5 md:p-6">
           <div className="flex flex-wrap items-start gap-4">
-            <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-[#781635]/70 to-[#d4a259]/35 text-white font-display text-3xl font-bold">
+            <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-[#22d3ee]/70 to-[#67e8f9]/35 text-white font-display text-3xl font-bold">
               {initial}
             </div>
             <div className="min-w-[250px] flex-1">
@@ -87,8 +87,8 @@ export default function Profile() {
               <p className="text-sm text-slate-300/75">@{user?.username?.toLowerCase() || 'luisnavarro'} · Mexico</p>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full border border-[#e7b18f]/30 bg-[#781635]/30 px-3 py-1 text-xs text-[#f7e2d5]">Oyente premium</span>
-                <span className="rounded-full border border-[#d4a259]/30 bg-[#d4a259]/25 px-3 py-1 text-xs text-[#f2dec2]">Nivel 12</span>
+                <span className="rounded-full border border-[#ff8d89]/30 bg-[#22d3ee]/30 px-3 py-1 text-xs text-[#fff8ef]">Oyente premium</span>
+                <span className="rounded-full border border-[#67e8f9]/30 bg-[#67e8f9]/25 px-3 py-1 text-xs text-[#a5f3fc]">Nivel 12</span>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-200/80">
@@ -112,7 +112,7 @@ export default function Profile() {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+          <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
             <div className="mb-4 inline-flex items-center gap-2 text-[#f0b7a9]">
               <UilChartLine size={16} />
               <p className="text-xs uppercase tracking-[0.16em]">Top artistas</p>
@@ -122,7 +122,7 @@ export default function Profile() {
               {topArtists.map((artist, index) => (
                 <div key={artist.name} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
                   <span className="w-5 text-right text-xs text-slate-300/65">{index + 1}</span>
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#781635]/30 to-[#d4a259]/30 text-xs font-bold text-white">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#22d3ee]/30 to-[#67e8f9]/30 text-xs font-bold text-white">
                     {artist.name[0]}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -136,7 +136,7 @@ export default function Profile() {
           </article>
 
           <div className="space-y-4">
-            <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+            <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
               <div className="mb-4 inline-flex items-center gap-2 text-[#e5be85]">
                 <UilMusic size={16} />
                 <p className="text-xs uppercase tracking-[0.16em]">Reciente</p>
@@ -144,7 +144,7 @@ export default function Profile() {
               <div className="space-y-2.5">
                 {recentTracks.map(track => (
                   <div key={track.title} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#781635]/35 text-[#f7e2d5]">
+                    <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#22d3ee]/35 text-[#fff8ef]">
                       <UilMusic size={14} />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -157,8 +157,8 @@ export default function Profile() {
               </div>
             </article>
 
-            <article className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
-              <div className="mb-4 inline-flex items-center gap-2 text-[#f2cab4]">
+            <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
+              <div className="mb-4 inline-flex items-center gap-2 text-[#67e8f9]">
                 <UilStar size={16} />
                 <p className="text-xs uppercase tracking-[0.16em]">Insignias</p>
               </div>
@@ -167,7 +167,7 @@ export default function Profile() {
                   const Icon = badge.icon
                   return (
                     <div key={badge.label} className="rounded-2xl border border-white/12 bg-white/5 p-3">
-                      <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#781635]/30 to-[#d4a259]/30 text-[#f7e2d5]">
+                      <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#22d3ee]/30 to-[#67e8f9]/30 text-[#fff8ef]">
                         <Icon size={15} />
                       </span>
                       <p className="text-xs font-semibold text-white">{badge.label}</p>
@@ -180,7 +180,7 @@ export default function Profile() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/12 bg-slate-950/35 p-5">
+        <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5">
           <div className="mb-3 inline-flex items-center gap-2 text-amber-200">
             <UilBell size={16} />
             <p className="text-xs uppercase tracking-[0.16em]">Configuracion</p>

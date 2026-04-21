@@ -25,7 +25,7 @@ function AvatarPill({ name }: { name: string }) {
     .toUpperCase()
 
   return (
-    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#781635]/60 to-[#d4a259]/35 font-display text-sm font-bold text-white">
+    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#22d3ee]/60 to-[#67e8f9]/35 font-display text-sm font-bold text-white">
       {initials}
     </span>
   )
@@ -69,7 +69,7 @@ function SongCardItem({ card, delay = 0 }: { card: FeedItem; delay?: number }) {
 
   return (
     <article
-      className="animate-fade-in-up rounded-3xl border border-white/12 bg-white/[0.04] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+      className="animate-fade-in-up rounded-3xl border border-white/12 bg-[#25252a]/70 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="flex items-start gap-3">
@@ -80,7 +80,7 @@ function SongCardItem({ card, delay = 0 }: { card: FeedItem; delay?: number }) {
             <span className="text-xs uppercase tracking-[0.14em] text-slate-300/60">{timeAgo}</span>
           </div>
           <p className="text-sm text-slate-300/80">{artistAlbum}</p>
-          <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-[#d4a259]/30 bg-[#d4a259]/18 px-2 py-1 text-xs text-[#e5be85]">
+          <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-[#67e8f9]/30 bg-[#67e8f9]/18 px-2 py-1 text-xs text-[#e5be85]">
             <UilHeartRate size={13} />
             {mood}
           </div>
@@ -94,7 +94,7 @@ function SongCardItem({ card, delay = 0 }: { card: FeedItem; delay?: number }) {
             onClick={() => handleReact(item.emoji)}
             className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs transition-transform active:scale-95 ${
               liked[item.emoji]
-                ? 'border-[#e7b18f]/40 bg-[#781635]/35 text-[#f7e2d5]'
+                ? 'border-[#ff8d89]/40 bg-[#22d3ee]/35 text-[#fff8ef]'
                 : 'border-white/15 bg-white/5 text-slate-200/85 hover:bg-white/10'
             }`}
           >
@@ -123,13 +123,10 @@ function SongCardItem({ card, delay = 0 }: { card: FeedItem; delay?: number }) {
 export default function MainFeed() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [progress, setProgress] = useState(43)
+  const [loading, setLoading] = useState(true)
   const [feedData, setFeedData] = useState<FeedItem[]>([])
   const [nowPlaying, setNowPlaying] = useState<any>(null)
-  const [activities, setActivities] = useState<string[]>([
-    "Alex agrego 3 tracks al mix de noche.",
-    "Sarah reacciono a tu playlist chillwave.",
-    "Jordan te invito a una listening room."
-  ])
+  const [activities, setActivities] = useState<string[]>([])
   const router = useRouter()
 
   useEffect(() => {
@@ -146,6 +143,8 @@ export default function MainFeed() {
         }
       } catch (err) {
         console.error("Error loading feed", err)
+      } finally {
+        setLoading(false)
       }
     }
     loadData()
@@ -188,8 +187,8 @@ export default function MainFeed() {
     <AppShell>
       <div className="mx-auto grid w-full max-w-6xl gap-5 px-4 py-5 md:px-6 md:py-8 xl:grid-cols-[minmax(0,1fr)_320px]">
         <section className="space-y-5">
-          <header className="rounded-3xl border border-white/12 bg-white/[0.04] p-5 md:p-6">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#f2cab4]">Music activity feed</p>
+          <header className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5 md:p-6">
+            <p className="text-xs uppercase tracking-[0.18em] text-[#67e8f9]">Music activity feed</p>
             <h1 className="mt-2 font-display text-3xl font-black text-white md:text-4xl">Movimiento social en tiempo real</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/75 md:text-base">
               Explora lo que tus amigos estan escuchando y reacciona al instante. Tu timeline se adapta al ritmo comun de la red.
@@ -199,7 +198,7 @@ export default function MainFeed() {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => router.push('/twin-match')}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#781635] to-[#e4504a] px-4 py-2 text-sm font-semibold text-white"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#22d3ee] to-[#ff8d89] px-4 py-2 text-sm font-semibold text-white"
                 >
                   <UilUsersAlt size={16} />
                   Ver Twin Match
@@ -213,24 +212,24 @@ export default function MainFeed() {
                 </button>
               </div>
 
-              <div className="rounded-2xl border border-[#d4a259]/20 bg-black/25 p-4">
+              <div className="rounded-2xl border border-[#67e8f9]/20 bg-black/25 p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#f2cab4]/85">Compartir snapshot</p>
-                  <span className="rounded-full bg-[#d4a259]/20 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[#f2dec2]">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#67e8f9]/85">Compartir snapshot</p>
+                  <span className="rounded-full bg-[#67e8f9]/20 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[#a5f3fc]">
                     Hoy
                   </span>
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px]">
                   <div className="rounded-xl bg-white/5 px-2 py-2">
-                    <p className="text-[#f2cab4]">84%</p>
+                    <p className="text-[#67e8f9]">84%</p>
                     <p className="mt-1 text-slate-300/60">Match</p>
                   </div>
                   <div className="rounded-xl bg-white/5 px-2 py-2">
-                    <p className="text-[#f2cab4]">27</p>
+                    <p className="text-[#67e8f9]">27</p>
                     <p className="mt-1 text-slate-300/60">Amigos</p>
                   </div>
                   <div className="rounded-xl bg-white/5 px-2 py-2">
-                    <p className="text-[#f2cab4]">3</p>
+                    <p className="text-[#67e8f9]">3</p>
                     <p className="mt-1 text-slate-300/60">Twins</p>
                   </div>
                 </div>
@@ -243,8 +242,11 @@ export default function MainFeed() {
           </header>
 
           <div className="space-y-4">
-            {feedData.length === 0 && (
+            {loading && (
                <div className="p-8 text-center text-slate-400">Loading feed...</div>
+            )}
+            {!loading && feedData.length === 0 && (
+               <div className="p-8 text-center text-slate-400">No hay actividad reciente en tu red.</div>
             )}
             {feedData.map((card, index) => (
               <SongCardItem key={card.id || index} card={card} delay={index * 0.07} />
@@ -253,16 +255,16 @@ export default function MainFeed() {
         </section>
 
         <aside className="space-y-4">
-          <section className="rounded-3xl border border-white/12 bg-slate-950/35 p-5">
+          <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-xs uppercase tracking-[0.18em] text-[#e5be85]">Now playing</p>
-              <span className="rounded-full bg-[#d4a259]/28 px-2 py-1 text-[11px] text-[#f2dec2]">Live</span>
+              <span className="rounded-full bg-[#67e8f9]/28 px-2 py-1 text-[11px] text-[#a5f3fc]">Live</span>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="font-display text-xl font-bold text-white">{nowPlaying?.title || 'Midnight City'}</p>
-              <p className="text-sm text-[#f2cab4]">{nowPlaying?.artist || 'M83'}</p>
-              <p className="text-xs text-slate-300/65">{nowPlaying?.album || "Hurry Up, We're Dreaming"}</p>
+            <div className="rounded-2xl border border-white/10 bg-[#25252a]/70 p-4">
+              <p className="font-display text-xl font-bold text-white">{nowPlaying?.title || 'No playback activo'}</p>
+              <p className="text-sm text-[#67e8f9]">{nowPlaying?.artist || 'Esperando música'}</p>
+              <p className="text-xs text-slate-300/65">{nowPlaying?.album || "Spotify Session"}</p>
 
               <div className="mt-4 flex items-end gap-1">
                 {Array.from({ length: 12 }).map((_, index) => (
@@ -281,7 +283,7 @@ export default function MainFeed() {
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#781635] via-[#e4504a] to-[#d4a259]"
+                    className="h-full rounded-full bg-gradient-to-r from-[#22d3ee] via-[#ff8d89] to-[#67e8f9]"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -297,13 +299,15 @@ export default function MainFeed() {
             </div>
           </section>
 
-          <section className="rounded-3xl border border-white/12 bg-white/[0.04] p-5">
+          <section className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
             <div className="mb-3 inline-flex items-center gap-2 text-[#f0b7a9]">
               <UilMusic size={16} />
               <p className="text-xs uppercase tracking-[0.16em]">Actividad de sala</p>
             </div>
             <div className="space-y-2 text-sm text-slate-200/85">
-              {activities.map((act, i) => (
+              {activities.length === 0 ? (
+                 <p className="text-slate-500 italic text-xs mt-4">La sala está silenciosa, espera interacciones.</p>
+              ) : activities.map((act, i) => (
                  <p key={i} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">{act}</p>
               ))}
             </div>

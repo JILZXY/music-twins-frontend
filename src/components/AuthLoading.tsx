@@ -66,12 +66,12 @@ function AuthLoadingContent() {
   }, [router, searchParams, setUser, setAuthenticated])
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-app-background px-4 py-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_22%,rgba(120,22,53,0.42),transparent_30%),radial-gradient(circle_at_78%_20%,rgba(228,80,74,0.26),transparent_28%),radial-gradient(circle_at_50%_90%,rgba(212,162,89,0.2),transparent_35%)]" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0e0e11] text-[#fff8ef] px-4 py-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_22%,rgba(103, 232, 249,0.42),transparent_30%),radial-gradient(circle_at_78%_20%,rgba(255, 141, 137,0.26),transparent_28%),radial-gradient(circle_at_50%_90%,rgba(212,162,89,0.2),transparent_35%)]" />
 
-      <section className="relative w-full max-w-xl rounded-[2rem] border border-white/12 bg-slate-950/35 p-6 text-slate-100 shadow-[0_20px_55px_rgba(0,0,0,0.45)] backdrop-blur-xl md:p-8">
+      <section className="relative w-full max-w-xl rounded-[2rem] border border-white/12 bg-[#1f1f23]/70 p-6 text-slate-100 shadow-[0_20px_55px_rgba(0,0,0,0.45)] backdrop-blur-xl md:p-8">
         <div className="mb-6 flex items-center justify-center">
-          <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-[#781635] via-[#e4504a] to-[#d4a259] text-slate-950 shadow-[0_10px_30px_rgba(244,114,182,0.45)]">
+          <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-[#22d3ee] via-[#ff8d89] to-[#67e8f9] text-slate-950 shadow-[0_10px_30px_rgba(244,114,182,0.45)]">
             <UilMusic size={30} />
           </div>
         </div>
@@ -82,7 +82,7 @@ function AuthLoadingContent() {
         <div className="mt-8 space-y-4">
           <div className="overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-[#781635] via-[#e4504a] to-[#d4a259] transition-all duration-150"
+              className="h-2 rounded-full bg-gradient-to-r from-[#22d3ee] via-[#ff8d89] to-[#67e8f9] transition-all duration-150"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -92,8 +92,8 @@ function AuthLoadingContent() {
             <span>{steps.length} etapas</span>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-            <div className="flex items-center gap-2 text-[#f2cab4]">
+          <div className="rounded-2xl border border-white/10 bg-[#25252a]/70 p-4">
+            <div className="flex items-center gap-2 text-[#67e8f9]">
               <UilSpinnerAlt size={16} className="animate-spin" />
               <span className="text-sm font-medium">{steps[stepIndex]}...</span>
             </div>
@@ -119,7 +119,7 @@ function AuthLoadingContent() {
 
 export default function AuthLoading() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-app-background" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#0e0e11] text-[#fff8ef]" />}>
       <AuthLoadingContent />
     </Suspense>
   )

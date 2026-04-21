@@ -80,17 +80,30 @@ export default function AppShell({ children }: AppShellProps) {
   const { user, setUser } = useAuthStore()
   const [nowPlaying, setNowPlaying] = useState<any>(null)
 
-  // Restore session globally if store was wiped by refresh
+  // Provide strict auth guarding
   useEffect(() => {
-    if (!user && typeof window !== 'undefined' && localStorage.getItem('access_token')) {
-      AuthService.getProfile()
-        .then(res => {
-          const u = (res as any)?.user || (res as any)?.data || res;
-          if (u) setUser(u);
-        })
-        .catch(err => console.warn("Could not restore user session:", err));
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+    if (!user) {
+      if (!token) {
+        // Ghost user without token
+        router.replace('/');
+      } else {
+        // Token exists but store was wiped (refresh), try restoring
+        AuthService.getProfile()
+          .then(res => {
+            const u = (res as any)?.user || (res as any)?.data || res;
+            if (u) setUser(u);
+            else router.replace('/');
+          })
+          .catch(err => {
+            console.warn("Session expired or invalid:", err);
+            localStorage.removeItem('access_token');
+            router.replace('/');
+          });
+      }
     }
-  }, [user, setUser])
+  }, [user, setUser, router])
 
   useEffect(() => {
     PlayerService.getNowPlaying()

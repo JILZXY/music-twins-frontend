@@ -34,14 +34,15 @@ function AuthLoadingContent() {
         setStepIndex(1)
         setProgress(30)
 
-        const user = await AuthService.getProfile()
+        const rawRes = await AuthService.getProfile()
         if (!isMounted) return
 
         setStepIndex(2)
         setProgress(60)
 
-        if (user) {
-          setUser(user)
+        const u = (rawRes as any)?.user || (rawRes as any)?.data || rawRes;
+        if (u) {
+          setUser(u)
           setAuthenticated(true)
         }
 

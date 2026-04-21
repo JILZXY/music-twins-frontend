@@ -60,7 +60,7 @@ export default function Profile() {
       .catch(e => console.warn(e));
   }, [])
 
-  const displayName = user?.displayName || 'Luis Navarro'
+  const displayName = user?.displayName || 'Usuario '
   const initial = displayName.charAt(0).toUpperCase()
 
   return (
@@ -77,7 +77,7 @@ export default function Profile() {
             )}
             <div className="min-w-[250px] flex-1">
               <h1 className="font-display text-3xl font-black text-white">{displayName}</h1>
-              <p className="text-sm text-slate-300/75">{user?.email || '@luisnavarro'} · Spotify Linked</p>
+              <p className="text-sm text-slate-300/75">{user?.email || 'Cuenta Vinculada'} · Spotify Linked</p>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 <span className="rounded-full border border-[#ff8d89]/30 bg-[#22d3ee]/30 px-3 py-1 text-xs text-[#fff8ef]">Oyente premium</span>

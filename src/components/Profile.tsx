@@ -1,31 +1,10 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UilBell, UilChartLine, UilFire, UilMusic, UilShieldCheck, UilStar, UilUser } from '@iconscout/react-unicons'
 import AppShell from './shared/AppShell'
 import { useAuthStore } from '../services/store'
-
-const topArtists = [
-  { name: 'M83', genre: 'Synthwave', plays: 348 },
-  { name: 'Tame Impala', genre: 'Psychedelic', plays: 290 },
-  { name: 'Bon Iver', genre: 'Folk', plays: 241 },
-  { name: 'Radiohead', genre: 'Alt Rock', plays: 198 },
-  { name: 'The National', genre: 'Indie Rock', plays: 177 },
-]
-
-const recentTracks = [
-  { title: 'Midnight City', artist: 'M83', time: 'Hace 5 min' },
-  { title: 'Let It Happen', artist: 'Tame Impala', time: 'Hace 22 min' },
-  { title: 'Holocene', artist: 'Bon Iver', time: 'Hace 1h' },
-  { title: 'Fake Plastic Trees', artist: 'Radiohead', time: 'Hace 2h' },
-]
-
-const badges = [
-  { icon: UilMusic, label: 'Oyente compulsivo', desc: '+1000h escuchadas' },
-  { icon: UilStar, label: 'Twin Finder', desc: '5+ matches perfectos' },
-  { icon: UilFire, label: 'Racha de 30 dias', desc: '30 dias consecutivos' },
-  { icon: UilShieldCheck, label: 'Perfil verificado', desc: 'Actividad saludable' },
-]
+import { PlayerService } from '../services/api'
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -70,6 +49,16 @@ export default function Profile() {
   const [shareEnabled, setShareEnabled] = useState(true)
   const [publicProfile, setPublicProfile] = useState(true)
   const { user } = useAuthStore()
+  const [realRecent, setRealRecent] = useState<any[]>([])
+
+  useEffect(() => {
+    PlayerService.getRecentTracks(15)
+      .then(res => {
+         const data = res?.items || res?.data || res || [];
+         if (Array.isArray(data)) setRealRecent(data);
+      })
+      .catch(e => console.warn(e));
+  }, [])
 
   const displayName = user?.displayName || 'Luis Navarro'
   const initial = displayName.charAt(0).toUpperCase()
@@ -108,77 +97,28 @@ export default function Profile() {
           </div>
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard label="Horas escuchadas" value="1,248h" sub="Este ano" />
-          <StatCard label="Twin matches" value="12" sub="3 nuevos" />
-          <StatCard label="Genero favorito" value="Indie" />
-          <StatCard label="Streak" value="30" sub="dias" />
-        </section>
-
-        <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
-            <div className="mb-4 inline-flex items-center gap-2 text-[#f0b7a9]">
-              <UilChartLine size={16} />
-              <p className="text-xs uppercase tracking-[0.16em]">Top artistas</p>
-            </div>
-
-            <div className="space-y-2.5">
-              {topArtists.map((artist, index) => (
-                <div key={artist.name} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
-                  <span className="w-5 text-right text-xs text-slate-300/65">{index + 1}</span>
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#22d3ee]/30 to-[#67e8f9]/30 text-xs font-bold text-white">
-                    {artist.name[0]}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-white">{artist.name}</p>
-                    <p className="text-xs text-slate-300/65">{artist.genre}</p>
-                  </div>
-                  <span className="text-xs text-slate-200/75">{artist.plays}</span>
-                </div>
-              ))}
-            </div>
-          </article>
-
+        <section className="grid gap-4 xl:grid-cols-[1fr]">
           <div className="space-y-4">
             <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
               <div className="mb-4 inline-flex items-center gap-2 text-[#e5be85]">
                 <UilMusic size={16} />
-                <p className="text-xs uppercase tracking-[0.16em]">Reciente</p>
+                <p className="text-xs uppercase tracking-[0.16em]">Reciente de Spotify</p>
               </div>
               <div className="space-y-2.5">
-                {recentTracks.map(track => (
-                  <div key={track.title} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+                {realRecent.map((trackObj, idx) => {
+                   const track = trackObj?.track || trackObj;
+                   return (
+                  <div key={idx} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
                     <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#22d3ee]/35 text-[#fff8ef]">
                       <UilMusic size={14} />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-white">{track.title}</p>
-                      <p className="text-xs text-slate-300/65">{track.artist}</p>
+                      <p className="truncate text-sm font-semibold text-white">{track?.name || 'Unknown Track'}</p>
+                      <p className="text-xs text-slate-300/65">{track?.artists?.[0]?.name || 'Spotify Session'}</p>
                     </div>
-                    <span className="text-xs text-slate-300/65">{track.time}</span>
                   </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
-              <div className="mb-4 inline-flex items-center gap-2 text-[#67e8f9]">
-                <UilStar size={16} />
-                <p className="text-xs uppercase tracking-[0.16em]">Insignias</p>
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {badges.map(badge => {
-                  const Icon = badge.icon
-                  return (
-                    <div key={badge.label} className="rounded-2xl border border-white/12 bg-white/5 p-3">
-                      <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#22d3ee]/30 to-[#67e8f9]/30 text-[#fff8ef]">
-                        <Icon size={15} />
-                      </span>
-                      <p className="text-xs font-semibold text-white">{badge.label}</p>
-                      <p className="text-xs text-slate-300/65">{badge.desc}</p>
-                    </div>
-                  )
-                })}
+                )})}
+                {realRecent.length === 0 && <p className="text-sm text-slate-400">Aún no hay reproducciones recientes.</p>}
               </div>
             </article>
           </div>

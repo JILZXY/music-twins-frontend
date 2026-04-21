@@ -40,6 +40,9 @@ export const InteractionService = {
 export const PlayerService = {
   getNowPlaying: (): Promise<any> => {
     return fetchWithAuth('/spotify/now-playing');
+  },
+  getRecentTracks: (limit: number = 20): Promise<any> => {
+    return fetchWithAuth(`/spotify/recent?limit=${limit}`);
   }
 };
 

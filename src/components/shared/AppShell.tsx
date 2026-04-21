@@ -77,8 +77,20 @@ export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname()
   const router = useRouter()
   const activeView = pathnameToView(pathname)
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const [nowPlaying, setNowPlaying] = useState<any>(null)
+
+  // Restore session globally if store was wiped by refresh
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined' && localStorage.getItem('access_token')) {
+      AuthService.getProfile()
+        .then(res => {
+          const u = (res as any)?.user || (res as any)?.data || res;
+          if (u) setUser(u);
+        })
+        .catch(err => console.warn("Could not restore user session:", err));
+    }
+  }, [user, setUser])
 
   useEffect(() => {
     PlayerService.getNowPlaying()

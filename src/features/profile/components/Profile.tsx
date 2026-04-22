@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { UilBell, UilChartLine, UilFire, UilMusic, UilShieldCheck, UilStar, UilUser } from '@iconscout/react-unicons'
-import AppShell from './shared/AppShell'
-import { useAuthStore } from '../services/store'
-import { PlayerService } from '../services/api'
+import { UilBell, UilMusic } from '@iconscout/react-unicons'
+import AppShell from '@/core/components/AppShell'
+import { useAuthStore } from '@/core/store/auth.store'
+import { SpotifyProfileService } from '@/features/profile/services/profile.service'
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -52,7 +52,7 @@ export default function Profile() {
   const [realRecent, setRealRecent] = useState<any[]>([])
 
   useEffect(() => {
-    PlayerService.getRecentTracks(15)
+    SpotifyProfileService.getRecentTracks(15)
       .then(res => {
          const data = res?.items || res?.data || res || [];
          if (Array.isArray(data)) setRealRecent(data);
@@ -80,14 +80,7 @@ export default function Profile() {
               <p className="text-sm text-slate-300/75">{user?.email || 'Cuenta Vinculada'} · Spotify Linked</p>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full border border-[#ff8d89]/30 bg-[#22d3ee]/30 px-3 py-1 text-xs text-[#fff8ef]">Oyente premium</span>
-                <span className="rounded-full border border-[#67e8f9]/30 bg-[#67e8f9]/25 px-3 py-1 text-xs text-[#a5f3fc]">Nivel 12</span>
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-200/80">
-                <span><strong className="text-white">47</strong> amigos</span>
-                <span><strong className="text-white">12</strong> twins</span>
-                <span><strong className="text-white">823</strong> canciones compartidas</span>
+                <span className="rounded-full border border-[#ff8d89]/30 bg-[#22d3ee]/30 px-3 py-1 text-xs text-[#fff8ef]">Cuenta Oficial</span>
               </div>
             </div>
 

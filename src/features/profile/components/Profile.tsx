@@ -87,7 +87,7 @@ export default function Profile() {
             <div className="space-y-4">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-[#67e8f9]">ID de Usuario</p>
-                <p className="mt-1 font-mono text-xs text-slate-300">{user?.userId || user?.id || 'N/A'}</p>
+                <p className="mt-1 font-mono text-xs text-slate-300">{user?.id || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-[#67e8f9]">Correo Electrónico</p>

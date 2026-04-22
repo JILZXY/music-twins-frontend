@@ -119,10 +119,12 @@ export default function AppShell({ children }: AppShellProps) {
           }
           
           const trackName = data.name || data.item?.name;
-          const trackId = data.id || data.item?.id;
+          const trackId = data.id || data.item?.id || data.uri; // Intentar múltiples campos de ID
           const artist = data.artist || (data.item?.artists ? data.item.artists[0]?.name : undefined);
           const album = data.album || data.item?.album?.name;
           const imageUrl = data.imageUrl || data.item?.album?.images?.[0]?.url;
+
+          console.log("[MusicTwins] Detectado:", trackName, "ID:", trackId);
 
           setNowPlaying({
             name: trackName,
@@ -131,8 +133,9 @@ export default function AppShell({ children }: AppShellProps) {
             imageUrl
           });
 
-          // Sync with backend if it's a new track
+          // Sincronizar si es una canción nueva y tenemos ID
           if (trackId && trackId !== lastTrackId.current) {
+            console.log("[MusicTwins] Sincronizando nueva canción con el servidor...");
             lastTrackId.current = trackId;
             PlayerService.syncPlayback({
               trackId,
@@ -140,7 +143,9 @@ export default function AppShell({ children }: AppShellProps) {
               artist,
               albumName: album,
               albumImageUrl: imageUrl
-            }).catch(e => console.error("Sync failed", e));
+            })
+            .then(() => console.log("[MusicTwins] Sincronización exitosa"))
+            .catch(e => console.error("[MusicTwins] Error al sincronizar:", e));
           }
         })
         .catch((e) => console.warn("No playback available", e))

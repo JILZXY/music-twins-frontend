@@ -22,7 +22,11 @@
         "name": "next"
       }
     ],
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",

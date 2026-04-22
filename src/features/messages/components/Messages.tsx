@@ -99,16 +99,20 @@ export default function Messages() {
         const list = Array.isArray(raw) ? raw : (raw as any).items || []
         
         // Map backend format: { id, user: { id, displayName, avatarUrl }, lastMessage, unreadCount }
-        const mapped = list.map((c: any, index: number) => ({
-          id: c.id || index.toString(),
-          otherUserId: c.user?.id || '',
-          name: c.user?.displayName || `Usuario ${index}`,
-          avatarUrl: c.user?.avatarUrl || null,
-          online: false, 
-          lastMsg: c.lastMessage || 'No hay mensajes aún', 
-          time: 'reciente',
-          unread: c.unreadCount || 0,
-        }))
+        const mapped = list.map((c: any, index: number) => {
+          // Extraer último mensaje de forma segura
+          const lastText = c.lastMessage || 'Empieza una conversación';
+          return {
+            id: c.id || index.toString(),
+            otherUserId: c.user?.id || '',
+            name: c.user?.displayName || `Usuario ${index}`,
+            avatarUrl: c.user?.avatarUrl || null,
+            online: false, 
+            lastMsg: lastText, 
+            time: 'reciente',
+            unread: c.unreadCount || 0,
+          };
+        })
         setConversations(mapped)
         if (mapped.length > 0 && !activeConvId) {
           setActiveConvId(mapped[0].id)
@@ -236,7 +240,7 @@ export default function Messages() {
 
   return (
     <AppShell>
-      <div className="mx-auto grid h-full min-h-screen w-full max-w-6xl gap-4 px-4 py-5 md:px-6 md:py-8 lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="mx-auto grid h-[calc(100vh-8rem)] w-full max-w-6xl gap-4 px-4 py-5 md:px-6 md:py-8 lg:grid-cols-[320px_minmax(0,1fr)] overflow-hidden">
         <aside className="rounded-3xl border border-white/12 bg-[#25252a]/70">
           <div className="border-b border-white/10 p-4">
             <h1 className="font-display text-2xl font-black text-white">Mensajes</h1>
@@ -252,7 +256,7 @@ export default function Messages() {
             </label>
           </div>
 
-          <div className="max-h-[65vh] overflow-y-auto">
+          <div className="h-[calc(100%-120px)] overflow-y-auto no-scrollbar">
             {filteredConversations.length === 0 && <p className="p-4 text-center text-sm text-slate-400">0 conversaciones encontradas</p>}
             {filteredConversations.map(conversation => (
               <button
@@ -280,7 +284,7 @@ export default function Messages() {
           </div>
         </aside>
 
-        <section className="flex min-h-[70vh] flex-col rounded-3xl border border-white/12 bg-[#1f1f23]/70">
+        <section className="flex h-full flex-col rounded-3xl border border-white/12 bg-[#1f1f23]/70 overflow-hidden">
           {activeConversation ? (
             <>
               <header className="flex items-center gap-3 border-b border-white/10 p-4">

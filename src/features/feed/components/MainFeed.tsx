@@ -257,11 +257,10 @@ export default function MainFeed() {
                     )}
                     <span className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-[#1f1f23] bg-green-500 shadow-sm" />
                   </div>
-                  <div className="text-center min-w-0 w-full">
+                  <div className="text-center min-w-0 w-full mt-2">
                     <p className="truncate text-sm font-bold text-white">{friend.displayName}</p>
-                    <p className="truncate text-[10px] uppercase tracking-widest text-[#67e8f9]/60">Activo ahora</p>
-                    <p className="mt-1 truncate text-[11px] font-medium text-white">
-                      {friend.trackName || 'Escuchando música...'}
+                    <p className="truncate text-[10px] text-white/50 italic">
+                      {friend.trackName || 'Escuchando música'}
                     </p>
                   </div>
                 </div>
@@ -353,22 +352,22 @@ export default function MainFeed() {
                 <p className="text-sm text-slate-400 mt-1">Historial de música de tu red social.</p>
               </div>
 
-          <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar space-y-4">
+          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
             {loading && (
-               <div className="p-8 text-center text-slate-400">Loading feed...</div>
+               <div className="p-8 text-center text-slate-400">Cargando...</div>
             )}
             {!loading && feedData.length === 0 && (
-               <div className="p-8 text-center text-slate-400">No hay actividad reciente en tu red.</div>
+               <div className="p-8 text-center text-slate-400">No hay actividad reciente.</div>
             )}
             {!loading && feedData.map((item, i) => (
-              <article key={i} className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/2 p-3 transition-colors hover:bg-white/5">
-                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl">
-                  <img src={item.track?.albumImageUrl || '/song-placeholder.png'} className="h-full w-full object-cover" alt="" />
+              <article key={i} className="group relative min-w-[140px] max-w-[140px] shrink-0 rounded-2xl border border-white/5 bg-white/2 p-3 transition-all hover:bg-white/10">
+                <div className="aspect-square overflow-hidden rounded-xl mb-3 shadow-md">
+                  <img src={item.track?.albumImageUrl || '/song-placeholder.png'} className="h-full w-full object-cover transition-transform group-hover:scale-110" alt="" />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-white">{item.track?.name}</p>
-                  <p className="truncate text-xs text-slate-400">{item.track?.artist}</p>
-                  <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-[#67e8f9]/70">Escuchado por {item.user?.displayName || 'Alguien'}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-bold text-white">{item.track?.name}</p>
+                  <p className="truncate text-[10px] text-slate-400">{item.track?.artist}</p>
+                  <p className="mt-2 truncate text-[9px] font-black uppercase tracking-tighter text-[#67e8f9]/80">{item.user?.displayName}</p>
                 </div>
               </article>
             ))}

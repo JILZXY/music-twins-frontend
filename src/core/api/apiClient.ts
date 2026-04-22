@@ -31,7 +31,8 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   };
   config.credentials = 'include';
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const response = await fetch(`${API_BASE_URL}${cleanEndpoint}`, config);
 
   if (!response.ok) {
     if (response.status === 401) {

@@ -8,6 +8,9 @@ export const FeedService = {
   },
   getSummary: (): Promise<any[]> => {
     return fetchWithAuth('/feed/summary');
+  },
+  getTrending: (): Promise<any[]> => {
+    return fetchWithAuth('/feed/trending');
   }
 };
 

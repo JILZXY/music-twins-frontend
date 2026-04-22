@@ -138,12 +138,12 @@ function SongCardItem({ card, delay = 0 }: { card: FeedItem; delay?: number }) {
 }
 
 export default function MainFeed() {
-  const [isPlaying, setIsPlaying] = useState(true)
-  const [progress, setProgress] = useState(43)
   const [loading, setLoading] = useState(true)
   const [feedData, setFeedData] = useState<FeedItem[]>([])
   const [nowPlaying, setNowPlaying] = useState<any>(null)
   const [friendSummary, setFriendSummary] = useState<any[]>([])
+  const [topTracks, setTopTracks] = useState<any[]>([])
+  const [trendingTracks, setTrendingTracks] = useState<any[]>([])
   const [activities, setActivities] = useState<string[]>([])
   const router = useRouter()
 
@@ -173,6 +173,22 @@ export default function MainFeed() {
           setFriendSummary(summary);
         } catch(e) {
           console.warn("Could not fetch friend summary", e)
+        }
+
+        try {
+          // Use the profile service to get top tracks for the feed
+          const { SpotifyProfileService } = await import('@/features/profile/services/profile.service');
+          const tops = await SpotifyProfileService.getTopTracks(5);
+          setTopTracks(tops);
+        } catch(e) {
+          console.warn("Could not fetch top tracks for feed", e)
+        }
+
+        try {
+          const trending = await FeedService.getTrending();
+          setTrendingTracks(trending);
+        } catch(e) {
+          console.warn("Could not fetch trending tracks", e)
         }
       } catch (err) {
         console.error("Error loading feed", err)
@@ -213,53 +229,118 @@ export default function MainFeed() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!isPlaying) return
-    const id = setInterval(() => {
-      setProgress(value => (value >= 100 ? 0 : value + 0.08))
-    }, 160)
+    const interval = setInterval(() => {
+      FeedService.getSummary()
+        .then(summary => setFriendSummary(summary))
+        .catch(e => console.warn("Could not refresh friend summary", e))
+    }, 30000);
 
-    return () => clearInterval(id)
-  }, [isPlaying])
-
-  const progressLabel = useMemo(() => {
-    const totalSeconds = Math.floor((progress / 100) * 243)
-    const minutes = Math.floor(totalSeconds / 60)
-    const seconds = totalSeconds % 60
-    return `${minutes}:${String(seconds).padStart(2, '0')}`
-  }, [progress])
+    return () => clearInterval(interval);
+  }, [])
 
   return (
     <AppShell>
-      <div className="mx-auto grid w-full max-w-6xl gap-5 px-4 py-5 md:px-6 md:py-8 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <section className="space-y-5">
-          <header className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5 md:p-6">
-            <p className="text-xs uppercase tracking-[0.18em] text-[#67e8f9]">Music activity feed</p>
-            <h1 className="mt-2 font-display text-3xl font-black text-white md:text-4xl">Movimiento social en tiempo real</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200/75 md:text-base">
-              Explora lo que tus amigos estan escuchando y reacciona al instante. Tu timeline se adapta al ritmo comun de la red.
-            </p>
-
-            <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_290px]">
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => router.push('/twin-match')}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#22d3ee] to-[#ff8d89] px-4 py-2 text-sm font-semibold text-white hover:brightness-105"
-                >
-                  <UilUsersAlt size={16} />
-                  Añadir Amigos
-                </button>
-                <button
-                  onClick={() => router.push('/messages')}
-                  className="inline-flex items-center gap-2 rounded-2xl border border-[#22d3ee]/40 px-4 py-2 text-sm text-[#fff8ef] bg-[#22d3ee]/5 transition-colors hover:bg-white/10"
-                >
-                  <UilMessage size={16} />
-                  Abrir mensajes
-                </button>
-              </div>
-
+      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-6 md:px-8 md:py-10">
+        <section className="space-y-12">
+          {/* Section 1: Friends Live */}
+          <div>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="font-display text-2xl font-bold text-white flex items-center gap-2">
+                 <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                 Escuchando ahora
+              </h2>
+              <button onClick={() => router.push('/twin-match')} className="text-xs font-semibold text-[#67e8f9] uppercase tracking-wider hover:underline">Ver todos</button>
             </div>
-          </header>
+            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+              {friendSummary.length === 0 ? (
+                <div className="flex-1 rounded-3xl border border-white/5 bg-white/5 p-8 text-center text-slate-500 italic">
+                  Tus amigos no están escuchando música en este momento.
+                </div>
+              ) : friendSummary.map((friend, i) => (
+                <div key={i} className="flex min-w-[200px] shrink-0 flex-col items-center gap-3 rounded-3xl border border-white/10 bg-[#1f1f23]/60 p-4 transition-transform hover:scale-[1.02]">
+                  <div className="relative">
+                    {friend.avatarUrl ? (
+                      <img src={friend.avatarUrl} className="h-16 w-16 rounded-full object-cover shadow-lg" alt="" />
+                    ) : (
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-white/10 to-white/5" />
+                    )}
+                    <span className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-[#1f1f23] bg-green-500 shadow-sm" />
+                  </div>
+                  <div className="text-center min-w-0 w-full">
+                    <p className="truncate text-sm font-bold text-white">{friend.displayName}</p>
+                    <p className="mt-1 truncate text-[11px] text-[#67e8f9] font-medium">
+                      {friend.trackName || 'Explorando...'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 2: User Favorites / Top Tracks */}
+          <div>
+            <div className="mb-6">
+              <h2 className="font-display text-2xl font-bold text-white">Tus favoritos recientes</h2>
+              <p className="text-sm text-slate-400 mt-1">Lo que más has escuchado en Spotify estos días.</p>
+            </div>
+            <div className="flex gap-5 overflow-x-auto pb-4 no-scrollbar">
+              {topTracks.length === 0 ? (
+                Array.from({length: 3}).map((_, i) => (
+                  <div key={i} className="h-40 min-w-[160px] animate-pulse rounded-3xl bg-white/5" />
+                ))
+              ) : topTracks.map((track, i) => (
+                <div key={i} className="group relative min-w-[160px] shrink-0">
+                  <div className="aspect-square overflow-hidden rounded-3xl border border-white/10 shadow-lg transition-transform group-hover:scale-105">
+                    <img src={track.albumImageUrl} className="h-full w-full object-cover" alt="" />
+                  </div>
+                  <div className="mt-3 min-w-0">
+                    <p className="truncate text-sm font-bold text-white">{track.name}</p>
+                    <p className="truncate text-xs text-slate-400">{track.artist}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 3: Trending in Network */}
+          <div>
+            <div className="mb-6">
+              <h2 className="font-display text-2xl font-bold text-white">Lo más escuchado en tu red</h2>
+              <p className="text-sm text-slate-400 mt-1">Canciones populares entre tus amigos recientemente.</p>
+            </div>
+            <div className="flex gap-5 overflow-x-auto pb-4 no-scrollbar">
+              {trendingTracks.length === 0 ? (
+                <div className="flex-1 rounded-3xl border border-white/5 bg-white/5 p-8 text-center text-slate-500 italic">
+                  No hay suficientes datos para mostrar tendencias aún.
+                </div>
+              ) : trendingTracks.map((track, i) => (
+                <div key={i} className="group relative min-w-[160px] shrink-0">
+                  <div className="aspect-square overflow-hidden rounded-3xl border border-white/10 shadow-lg transition-transform group-hover:scale-105">
+                    {track.albumImageUrl ? (
+                       <img src={track.albumImageUrl} className="h-full w-full object-cover" alt="" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-white/5 text-slate-600">
+                        <UilMusic size={32} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3 min-w-0">
+                    <p className="truncate text-sm font-bold text-white">{track.name}</p>
+                    <p className="truncate text-xs text-slate-400">{track.artist}</p>
+                    <p className="mt-1 text-[10px] text-[#67e8f9] font-bold uppercase tracking-wider">{track.playCount} repros</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 4: Vertical Activity Feed */}
+          <div className="grid gap-8 xl:grid-cols-[1fr_320px]">
+            <div className="space-y-6">
+              <div className="mb-2">
+                <h2 className="font-display text-2xl font-bold text-white">Actividad reciente</h2>
+                <p className="text-sm text-slate-400 mt-1">Historial de música de tu red social.</p>
+              </div>
 
           <div className="space-y-4">
             {loading && (
@@ -274,117 +355,61 @@ export default function MainFeed() {
           </div>
         </section>
 
-        <aside className="space-y-4">
-          <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.18em] text-[#e5be85]">Now playing</p>
-              <span className="rounded-full bg-[#67e8f9]/28 px-2 py-1 text-[11px] text-[#a5f3fc]">Live</span>
-            </div>
+          </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#25252a]/70 p-4">
-              {nowPlaying?.imageUrl && (
-                <div className="mb-4 overflow-hidden rounded-xl border border-white/10 shadow-xl">
-                  <img src={nowPlaying.imageUrl} alt={nowPlaying.album} className="w-full object-cover aspect-square" />
+          <aside className="space-y-8">
+            <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-6 shadow-xl">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="inline-flex items-center gap-2 text-[#e5be85]">
+                  <UilMusic size={18} />
+                  <p className="text-xs font-bold uppercase tracking-[0.2em]">En vivo (Tú)</p>
                 </div>
-              )}
-              <p className="font-display text-xl font-bold text-white max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{nowPlaying?.name || 'No playback activo'}</p>
-              <p className="text-sm text-[#67e8f9] max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{nowPlaying?.artist || 'Esperando música'}</p>
-              <p className="text-xs text-slate-300/65 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{nowPlaying?.album || "Spotify Session"}</p>
+              </div>
 
-              <div className="mt-4 flex items-end gap-1">
-                {Array.from({ length: 12 }).map((_, index) => (
-                  <span
-                    key={index}
-                    className="eq-bar"
-                    style={{ height: `${6 + (index % 5) * 5}px`, animationDelay: `${index * 0.05}s` }}
-                  />
+              <div className="rounded-2xl border border-white/5 bg-[#25252a]/40 p-4">
+                {nowPlaying?.imageUrl ? (
+                   <div className="mb-4 overflow-hidden rounded-xl shadow-lg">
+                     <img src={nowPlaying.imageUrl} className="w-full object-cover aspect-square" alt="" />
+                   </div>
+                ) : (
+                  <div className="mb-4 flex aspect-square items-center justify-center rounded-xl bg-white/5 text-slate-600">
+                    <UilMusic size={40} />
+                  </div>
+                )}
+                <p className="truncate font-display text-lg font-bold text-white">{nowPlaying?.name || 'Nada sonando'}</p>
+                <p className="truncate text-sm text-[#67e8f9]">{nowPlaying?.artist || 'Abre Spotify'}</p>
+                
+                {nowPlaying && (
+                  <div className="mt-4 flex h-6 items-end gap-1">
+                    {Array.from({ length: 12 }).map((_, index) => (
+                      <span
+                        key={index}
+                        className="eq-bar"
+                        style={{ height: `${4 + (index % 5) * 4}px`, animationDelay: `${index * 0.05}s` }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-6">
+              <div className="mb-4 inline-flex items-center gap-2 text-[#f0b7a9]">
+                <UilMessage size={18} />
+                <p className="text-xs font-bold uppercase tracking-[0.16em]">Notificaciones</p>
+              </div>
+              <div className="space-y-3">
+                {activities.length === 0 ? (
+                   <p className="text-slate-500 text-xs italic">Sin actividad nueva.</p>
+                ) : activities.map((act, i) => (
+                   <p key={i} className="rounded-2xl bg-white/5 px-4 py-3 text-xs leading-relaxed text-slate-200">{act}</p>
                 ))}
               </div>
-
-              <div className="mt-4">
-                <div className="mb-1 flex justify-between text-xs text-slate-300/70">
-                  <span>{progressLabel}</span>
-                  <span>4:03</span>
-                </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#22d3ee] via-[#ff8d89] to-[#67e8f9]"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={() => setIsPlaying(value => !value)}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-3 py-2.5 text-sm text-slate-100 transition-colors hover:bg-white/10"
-              >
-                {isPlaying ? <UilFavorite size={16} /> : <UilPlay size={16} />}
-                {isPlaying ? 'Pausar session' : 'Reanudar session'}
-              </button>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/12 bg-[#1f1f23]/70 p-5 shadow-lg">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="inline-flex items-center gap-2 text-[#67e8f9]">
-                <UilUsersAlt size={18} />
-                <p className="text-xs font-bold uppercase tracking-[0.2em]">En directo (Amigos)</p>
-              </div>
-              <span className="h-1.5 w-1.5 rounded-full bg-[#67e8f9] animate-ping" />
-            </div>
-            <div className="space-y-4">
-              {friendSummary.map((friend, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  {friend.avatarUrl ? (
-                    <img src={friend.avatarUrl} className="h-8 w-8 rounded-full object-cover" alt="" />
-                  ) : (
-                    <div className="h-8 w-8 rounded-full bg-white/10" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-white">{friend.displayName}</p>
-                    <p className="truncate text-[10px] text-slate-400">
-                      {friend.trackName ? `Escuchando: ${friend.trackName}` : 'Sin actividad reciente'}
-                    </p>
-                  </div>
-                  {friend.trackName && (
-                    <span className="flex h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                  )}
-                </div>
-              ))}
-              {friendSummary.length === 0 && (
-                <p className="text-xs text-slate-500 italic">No hay amigos conectados.</p>
-              )}
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
-            <div className="mb-3 inline-flex items-center gap-2 text-[#f0b7a9]">
-              <UilMusic size={16} />
-              <p className="text-xs uppercase tracking-[0.16em]">Actividad de sala</p>
-            </div>
-            <div className="space-y-2 text-sm text-slate-200/85">
-              {activities.length === 0 ? (
-                 <p className="text-slate-500 italic text-xs mt-4">La sala está silenciosa, espera interacciones.</p>
-              ) : activities.map((act, i) => (
-                 <p key={i} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">{act}</p>
-              ))}
-            </div>
-          </section>
-          <section className="rounded-3xl border border-white/12 bg-[#25252a]/70 p-5">
-            <div className="mb-3 inline-flex items-center gap-2 text-[#ff8d89]">
-              <UilFavorite size={16} />
-              <p className="text-xs uppercase tracking-[0.16em]">Tendencias en tu red</p>
-            </div>
-            <div className="space-y-3">
-               <p className="text-[11px] text-slate-400">Basado en lo que tus amigos han escuchado mas hoy.</p>
-               <div className="rounded-2xl border border-white/5 bg-white/5 p-3">
-                  <p className="text-xs font-bold text-white">Próximamente</p>
-                  <p className="text-[10px] text-slate-300">Estamos analizando los datos de tu red...</p>
-               </div>
-            </div>
-          </section>
-        </aside>
-      </div>
-    </AppShell>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </AppShell>
   )
 }

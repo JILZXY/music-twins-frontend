@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useMemo } from 'react'
-import { AuthService } from '../services/api'
+import { AuthService } from '@/features/auth/services/auth.service'
 
 export default function LandingPage() {
   const router = useRouter()

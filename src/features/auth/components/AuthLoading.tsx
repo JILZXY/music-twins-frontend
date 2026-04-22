@@ -3,8 +3,8 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { UilMusic, UilSpinnerAlt } from '@iconscout/react-unicons'
-import { AuthService } from '../services/api'
-import { useAuthStore } from '../services/store'
+import { AuthService } from '@/features/auth/services/auth.service'
+import { useAuthStore } from '@/core/store/auth.store'
 
 const steps = [
   'Conectando con Spotify',

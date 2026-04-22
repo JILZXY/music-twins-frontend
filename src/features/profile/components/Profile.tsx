@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { UilBell, UilMusic, UilFavorite } from '@iconscout/react-unicons'
 import AppShell from '@/core/components/AppShell'
 import { useAuthStore } from '@/core/store/auth.store'
-import { SpotifyProfileService } from '@/features/profile/services/profile.service'
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -46,6 +44,9 @@ function ToggleRow({
 
 export default function Profile() {
   const { user } = useAuthStore()
+  const [allowFriendActivity, setAllowFriendActivity] = useState(true)
+  const [showNowPlaying, setShowNowPlaying] = useState(true)
+  const [allowMessages, setAllowMessages] = useState(true)
 
   useEffect(() => {
     // Solo info de cuenta, no necesitamos Spotify aquí por ahora según solicitud
@@ -81,7 +82,7 @@ export default function Profile() {
           </div>
         </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <article className="border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
             <h2 className="type-section mb-4 font-display font-bold uppercase text-[var(--app-text)]">Detalles de la Cuenta</h2>
             <div className="space-y-4">
@@ -102,26 +103,51 @@ export default function Profile() {
                 <p className="mt-1 text-sm text-[var(--app-text)]">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Desconocido'}</p>
               </div>
             </div>
-          </article>
 
-          <article className="border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
-            <h2 className="type-section mb-4 font-display font-bold uppercase text-[var(--app-text)]">Estadísticas MusicTwins</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-4">
-                <p className="text-2xl font-black text-[var(--app-text)]">100%</p>
-                <p className="text-[10px] uppercase tracking-widest text-[var(--app-muted)]">Match Score</p>
-              </div>
-              <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-4">
-                <p className="text-2xl font-black text-[var(--app-text)]">Activo</p>
-                <p className="text-[10px] uppercase tracking-widest text-[var(--app-muted)]">Estado</p>
-              </div>
-            </div>
             <div className="mt-6 border border-[var(--app-border)] bg-[var(--app-bg)] p-4">
-              <p className="text-xs leading-relaxed text-[var(--app-muted)]">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--accent-primary)]">Resumen de perfil</p>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--app-muted)]">
                 Tu cuenta está vinculada correctamente. MusicTwins utiliza tus datos de escucha para conectarte con personas que comparten tu ADN musical.
               </p>
             </div>
           </article>
+
+          <div className="space-y-6">
+            <article className="border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
+              <h2 className="type-section mb-4 font-display font-bold uppercase text-[var(--app-text)]">Estadísticas MusicTwins</h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <StatCard label="Match Score" value="100%" sub="Afinidad máxima" />
+                <StatCard label="Estado" value="Activo" sub="Cuenta operativa" />
+                <StatCard label="Proveedor" value="Spotify" sub="Conexión verificada" />
+              </div>
+            </article>
+
+            <article className="border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
+              <h2 className="mb-2 font-display text-3xl font-bold uppercase text-[var(--app-text)]">Preferencias</h2>
+              <p className="text-xs uppercase tracking-[0.14em] text-[var(--app-muted)]">Control visual del perfil</p>
+
+              <div className="mt-4 divide-y divide-[var(--app-border)]">
+                <ToggleRow
+                  label="Mostrar actividad a amigos"
+                  description="Permite que tus contactos vean tus reproducciones recientes."
+                  value={allowFriendActivity}
+                  onChange={setAllowFriendActivity}
+                />
+                <ToggleRow
+                  label="Mostrar now playing"
+                  description="Comparte la canción que escuchas en tiempo real."
+                  value={showNowPlaying}
+                  onChange={setShowNowPlaying}
+                />
+                <ToggleRow
+                  label="Permitir mensajes"
+                  description="Habilita nuevas conversaciones desde Twin Match."
+                  value={allowMessages}
+                  onChange={setAllowMessages}
+                />
+              </div>
+            </article>
+          </div>
         </section>
       </div>
     </AppShell>

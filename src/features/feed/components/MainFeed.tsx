@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   UilFavorite,
@@ -229,167 +229,222 @@ export default function MainFeed() {
     }
   }, [])
 
+  const liveCount = friendSummary.length
+  const trendCount = trendingTracks.length
+  const activityCount = feedData.length
+
   return (
     <AppShell>
-      <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-4 py-6 md:px-8 md:py-10">
-        <section className="space-y-[clamp(var(--space-8),4vw,var(--space-20))]">
-          {/* Section 1: Friends Live */}
-          <div>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="type-section font-display flex items-center gap-2 font-bold uppercase tracking-[0.02em] text-[var(--app-text)]">
-                 <span className="h-2 w-2 bg-[var(--accent-primary)] animate-pulse" />
-                 Escuchando ahora
+      <div className="mx-auto grid w-full max-w-[1480px] gap-6 px-4 py-6 md:px-8 md:py-8 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="space-y-[clamp(var(--space-8),4vw,var(--space-16))]">
+          <article className="grid gap-5 border border-[var(--app-border)] bg-[var(--app-surface)] p-5 md:grid-cols-[1.3fr_1fr] md:p-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent-primary)]">Dashboard Musical</p>
+              <h1 className="type-page mt-2 font-display font-black uppercase leading-none text-[var(--app-text)]">Tu actividad en tiempo real</h1>
+              <p className="mt-3 max-w-2xl text-sm text-[var(--app-muted)]">
+                Prioriza lo importante: quien escucha ahora, tus favoritos recientes, tendencias de tu red y el historial completo en una sola vista.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <button onClick={() => router.push('/twin-match')} className="border border-[var(--accent-primary)] bg-[rgba(224,108,26,0.14)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--app-text)]">
+                  Ver twins
+                </button>
+                <button onClick={() => router.push('/messages')} className="border border-[var(--app-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--app-muted)] hover:border-[var(--accent-primary)] hover:text-[var(--app-text)]">
+                  Ir a mensajes
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--app-muted)]">Live</p>
+                <p className="font-display text-3xl text-[var(--app-text)]">{liveCount}</p>
+                <p className="text-[10px] uppercase text-[var(--accent-primary)]">amigos activos</p>
+              </div>
+              <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--app-muted)]">Trends</p>
+                <p className="font-display text-3xl text-[var(--app-text)]">{trendCount}</p>
+                <p className="text-[10px] uppercase text-[var(--accent-primary)]">tracks en red</p>
+              </div>
+              <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--app-muted)]">Feed</p>
+                <p className="font-display text-3xl text-[var(--app-text)]">{activityCount}</p>
+                <p className="text-[10px] uppercase text-[var(--accent-primary)]">eventos</p>
+              </div>
+            </div>
+          </article>
+
+          <section>
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <h2 className="type-section font-display flex items-center gap-2 font-bold uppercase text-[var(--app-text)]">
+                <span className="h-2 w-2 bg-[var(--accent-primary)] animate-pulse" />
+                Escuchando ahora
               </h2>
               <button onClick={() => router.push('/twin-match')} className="border border-[var(--app-border)] px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--app-muted)] transition-colors hover:border-[var(--accent-primary)] hover:text-[var(--app-text)]">Ver todos</button>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-              {friendSummary.length === 0 ? (
-                <div className="flex-1 border border-[var(--app-border)] bg-[var(--app-surface)] p-8 text-center text-[var(--app-muted)]">
-                  Tus amigos no están escuchando música en este momento.
-                </div>
-              ) : friendSummary.map((friend, i) => (
-                <div key={i} className="flex min-w-[200px] shrink-0 flex-col items-center gap-3 border border-[var(--app-border)] bg-[var(--app-surface)] p-4 transition-colors hover:bg-[var(--app-surface-2)]">
-                  <div className="relative">
-                    {friend.avatarUrl ? (
-                      <img src={friend.avatarUrl} className="h-16 w-16 border border-[var(--app-border)] object-cover" alt="" />
-                    ) : (
-                      <div className="h-16 w-16 border border-[var(--app-border)] bg-[var(--app-bg)]" />
-                    )}
-                    <span className="absolute bottom-0 right-0 h-4 w-4 border border-[var(--app-surface)] bg-[var(--accent-primary)]" />
-                  </div>
-                  <div className="text-center min-w-0 w-full mt-2">
-                    <p className="truncate text-sm font-bold uppercase tracking-[0.04em] text-[var(--app-text)]">{friend.displayName}</p>
-                    <p className="truncate text-[10px] text-[var(--app-muted)]">
-                      {friend.trackName || 'Escuchando música'}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Section 2: User Favorites / Top Tracks */}
-          <div>
-            <div className="mb-6">
-              <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Tus favoritos recientes</h2>
-              <p className="mt-1 text-sm text-[var(--app-muted)]">Lo que más has escuchado en Spotify estos días.</p>
-            </div>
-            <div className="flex gap-5 overflow-x-auto pb-4 no-scrollbar">
+            {friendSummary.length === 0 ? (
+              <div className="border border-[var(--app-border)] bg-[var(--app-surface)] p-8 text-center text-[var(--app-muted)]">
+                Tus amigos no están escuchando música en este momento.
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {friendSummary.map((friend, i) => (
+                  <article key={i} className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 border border-[var(--app-border)] bg-[var(--app-surface)] p-4 transition-colors hover:bg-[var(--app-surface-2)]">
+                    <div className="relative">
+                      {friend.avatarUrl ? (
+                        <img src={friend.avatarUrl} className="h-16 w-16 border border-[var(--app-border)] object-cover" alt="" />
+                      ) : (
+                        <div className="h-16 w-16 border border-[var(--app-border)] bg-[var(--app-bg)]" />
+                      )}
+                      <span className="absolute bottom-0 right-0 h-3 w-3 border border-[var(--app-surface)] bg-[var(--accent-primary)]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold uppercase tracking-[0.04em] text-[var(--app-text)]">{friend.displayName}</p>
+                      <p className="truncate text-[10px] uppercase tracking-[0.1em] text-[var(--app-muted)]">{friend.trackName || 'Escuchando música'}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {feedData.length > 0 && (
+            <section>
+              <div className="mb-5 flex items-center gap-2">
+                <UilFavorite size={16} className="text-[var(--accent-primary)]" />
+                <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Momentos destacados</h2>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                {feedData.slice(0, 2).map((item, i) => (
+                  <SongCardItem key={`highlight-${i}`} card={item} delay={i * 0.08} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="grid gap-6 xl:grid-cols-2">
+            <article className="border border-[var(--app-border)] bg-[var(--app-surface)] p-5">
+              <div className="mb-5">
+                <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Tus favoritos recientes</h2>
+                <p className="mt-1 text-sm text-[var(--app-muted)]">Lo que más has escuchado en Spotify estos días.</p>
+              </div>
               {topTracks.length === 0 ? (
-                Array.from({length: 3}).map((_, i) => (
-                  <div key={i} className="h-40 min-w-[120px] animate-pulse border border-[var(--app-border)] bg-[var(--app-surface)]" />
-                ))
-              ) : topTracks.map((track, i) => (
-                <div key={i} className="group relative min-w-[155px] max-w-[155px] shrink-0">
-                  <div className="aspect-square overflow-hidden border border-[var(--app-border)] transition-transform group-hover:scale-[1.01]">
-                    {track.imageUrl || track.albumImageUrl ? (
-                       <img src={track.imageUrl || track.albumImageUrl} className="h-full w-full object-cover" alt="" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-[var(--app-bg)] text-[var(--app-muted)]">
-                        <UilMusic size={32} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-3 min-w-0">
-                    <p className="truncate text-sm font-bold uppercase tracking-[0.03em] text-[var(--app-text)]">{track.name}</p>
-                    <p className="truncate text-xs text-[var(--app-muted)]">{track.artist}</p>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="h-36 animate-pulse border border-[var(--app-border)] bg-[var(--app-bg)]" />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {topTracks.map((track, i) => (
+                    <article key={i} className="border border-[var(--app-border)] bg-[var(--app-bg)] p-2">
+                      <div className="aspect-square overflow-hidden border border-[var(--app-border)]">
+                        {track.imageUrl || track.albumImageUrl ? (
+                          <img src={track.imageUrl || track.albumImageUrl} className="h-full w-full object-cover" alt="" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[var(--app-muted)]">
+                            <UilMusic size={28} />
+                          </div>
+                        )}
+                      </div>
+                      <p className="mt-2 truncate text-xs font-bold uppercase tracking-[0.04em] text-[var(--app-text)]">{track.name}</p>
+                      <p className="truncate text-[10px] uppercase text-[var(--app-muted)]">{track.artist}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </article>
 
-          {/* Section 3: Trending in Network */}
-          <div>
-            <div className="mb-6">
-              <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Lo más escuchado en tu red</h2>
-              <p className="mt-1 text-sm text-[var(--app-muted)]">Canciones populares entre tus amigos recientemente.</p>
-              <div className="mt-5 space-y-6 border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
+            <article className="border border-[var(--app-border)] bg-[var(--app-surface)] p-5">
+              <div className="mb-5">
+                <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Lo más escuchado en tu red</h2>
+                <p className="mt-1 text-sm text-[var(--app-muted)]">Canciones populares entre tus amigos recientemente.</p>
+              </div>
+
               {trendingTracks.length === 0 ? (
-                <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-12 text-center text-[var(--app-muted)]">
+                <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-10 text-center text-[var(--app-muted)]">
                   No hay suficientes datos de tus amigos para mostrar tendencias aún.
                 </div>
               ) : (
-                trendingTracks.map((track, i) => {
-                  const maxCount = Math.max(...trendingTracks.map(t => parseInt(t.playCount || '1'))) || 1;
-                  const percentage = (parseInt(track.playCount || '0') / maxCount) * 100;
-                  return (
-                    <div key={i} className="group relative">
-                      <div className="mb-2 flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4 min-w-0 flex-1">
-                           <span className="w-4 text-xs font-black text-[var(--app-muted)]">{i + 1}</span>
-                           <div className="h-10 w-10 shrink-0 overflow-hidden border border-[var(--app-border)]">
-                             <img src={track.albumImageUrl || '/song-placeholder.png'} className="h-full w-full object-cover" alt="" />
-                           </div>
-                           <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-bold uppercase tracking-[0.03em] text-[var(--app-text)] group-hover:text-[var(--accent-primary)] transition-colors">{track.name}</p>
-                              <p className="truncate text-[10px] uppercase tracking-wider text-[var(--app-muted)]">{track.artist}</p>
-                           </div>
+                <div className="space-y-4">
+                  {trendingTracks.map((track, i) => {
+                    const maxCount = Math.max(...trendingTracks.map(t => parseInt(t.playCount || '1'))) || 1
+                    const percentage = (parseInt(track.playCount || '0') / maxCount) * 100
+                    return (
+                      <div key={i} className="border-b border-[var(--app-border)] pb-3 last:border-b-0">
+                        <div className="mb-2 grid grid-cols-[20px_40px_minmax(0,1fr)_auto] items-center gap-3">
+                          <span className="text-xs font-black text-[var(--app-muted)]">{i + 1}</span>
+                          <div className="h-10 w-10 overflow-hidden border border-[var(--app-border)]">
+                            <img src={track.albumImageUrl || '/song-placeholder.png'} className="h-full w-full object-cover" alt="" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold uppercase tracking-[0.03em] text-[var(--app-text)]">{track.name}</p>
+                            <p className="truncate text-[10px] uppercase tracking-[0.1em] text-[var(--app-muted)]">{track.artist}</p>
+                          </div>
+                          <span className="border border-[var(--app-border)] bg-[var(--app-bg)] px-2 py-0.5 text-[10px] font-bold text-[var(--accent-primary)]">{track.playCount} REPROS</span>
                         </div>
-                        <div className="text-right">
-                          <span className="border border-[var(--app-border)] bg-[var(--app-bg)] px-2 py-0.5 text-xs font-bold text-[var(--accent-primary)]">{track.playCount} <span className="text-[10px] opacity-70">REPROS</span></span>
+                        <div className="relative h-1.5 overflow-hidden bg-[var(--app-bg)]">
+                          <div className="absolute left-0 top-0 h-full bg-[var(--accent-primary)]" style={{ width: `${percentage}%` }} />
                         </div>
                       </div>
-                      <div className="relative h-1.5 w-full overflow-hidden bg-[var(--app-bg)]">
-                         <div 
-                           className="absolute left-0 top-0 h-full bg-[var(--accent-primary)] transition-all duration-1000 ease-out"
-                           style={{ width: `${percentage}%` }}
-                         />
+                    )
+                  })}
+                </div>
+              )}
+            </article>
+          </section>
+
+          <section>
+            <div className="mb-5 flex items-center gap-2">
+              <UilPlay size={16} className="text-[var(--accent-primary)]" />
+              <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Actividad reciente</h2>
+            </div>
+
+            <div className="border border-[var(--app-border)] bg-[var(--app-surface)]">
+              {loading ? (
+                <div className="space-y-3 p-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="h-16 animate-pulse border border-[var(--app-border)] bg-[var(--app-bg)]" />
+                  ))}
+                </div>
+              ) : feedData.length === 0 ? (
+                <p className="p-10 text-center text-sm text-[var(--app-muted)]">No hay actividad reciente.</p>
+              ) : (
+                <div className="divide-y divide-[var(--app-border)]">
+                  {feedData.map((item, i) => (
+                    <article key={i} className="grid grid-cols-[48px_minmax(0,1fr)_auto] items-center gap-4 p-3 transition-colors hover:bg-[var(--app-surface-2)]">
+                      <div className="h-12 w-12 overflow-hidden border border-[var(--app-border)]">
+                        <img src={item.track?.albumImageUrl || '/song-placeholder.png'} className="h-full w-full object-cover" alt="" />
                       </div>
-                    </div>
-                  )
-                })
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold uppercase tracking-[0.03em] text-[var(--app-text)]">{item.track?.name}</p>
+                        <p className="truncate text-xs text-[var(--app-muted)]">{item.track?.artist}</p>
+                        <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-[var(--accent-primary)]">Escuchado por {item.user?.displayName}</p>
+                      </div>
+                      <span className="text-[10px] uppercase tracking-[0.1em] text-[var(--app-muted)]">{getTimeAgo(item.playedAt)}</span>
+                    </article>
+                  ))}
+                </div>
               )}
             </div>
-            </div>
-          </div>
+          </section>
+        </section>
 
-          {/* Section 4: Vertical Activity Feed */}
-          <div className="grid gap-8 xl:grid-cols-[1fr_320px]">
-            <div className="space-y-6">
-              <div className="mb-2">
-                <h2 className="type-section font-display font-bold uppercase text-[var(--app-text)]">Actividad reciente</h2>
-                <p className="mt-1 text-sm text-[var(--app-muted)]">Historial de música de tu red social.</p>
-              </div>
-
-          <div className="space-y-4">
-            {loading ? (
-              [1, 2, 3].map(i => (
-                <div key={i} className="h-20 animate-pulse border border-[var(--app-border)] bg-[var(--app-surface)]" />
-              ))
-            ) : feedData.length === 0 ? (
-              <p className="p-10 text-center text-sm text-[var(--app-muted)]">No hay actividad reciente.</p>
-            ) : (
-              feedData.map((item, i) => (
-                <article key={i} className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-4 border-b border-[var(--app-border)] bg-[var(--app-surface)] p-3 transition-colors hover:bg-[var(--app-surface-2)]">
-                  <div className="h-12 w-12 shrink-0 overflow-hidden border border-[var(--app-border)]">
-                    <img src={item.track?.albumImageUrl || '/song-placeholder.png'} className="h-full w-full object-cover" alt="" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold uppercase tracking-[0.03em] text-[var(--app-text)]">{item.track?.name}</p>
-                    <p className="truncate text-xs text-[var(--app-muted)]">{item.track?.artist}</p>
-                    <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-[var(--accent-primary)]">Escuchado por {item.user?.displayName}</p>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
-        </div>
-
-        <aside className="sticky top-0 space-y-8 self-start">
-          <section className="border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
+        <aside className="space-y-6 xl:sticky xl:top-6 xl:h-fit">
+          <section className="border border-[var(--app-border)] bg-[var(--app-surface)] p-5">
             <div className="mb-4 flex items-center justify-between">
               <div className="inline-flex items-center gap-2 text-[var(--accent-primary)]">
                 <UilMusic size={18} />
                 <p className="text-xs font-bold uppercase tracking-[0.2em]">En vivo (Tú)</p>
               </div>
+              <UilUsersAlt size={16} className="text-[var(--app-muted)]" />
             </div>
 
             <div className="border border-[var(--app-border)] bg-[var(--app-bg)] p-4">
               {nowPlaying?.imageUrl ? (
-                 <div className="mb-4 overflow-hidden border border-[var(--app-border)]">
-                   <img src={nowPlaying.imageUrl} className="w-full object-cover aspect-square" alt="" />
-                 </div>
+                <div className="mb-4 overflow-hidden border border-[var(--app-border)]">
+                  <img src={nowPlaying.imageUrl} className="aspect-square w-full object-cover" alt="" />
+                </div>
               ) : (
                 <div className="mb-4 flex aspect-square items-center justify-center border border-[var(--app-border)] bg-[var(--app-surface)] text-[var(--app-muted)]">
                   <UilMusic size={40} />
@@ -397,38 +452,34 @@ export default function MainFeed() {
               )}
               <p className="truncate font-display text-[clamp(1.1rem,1rem+0.4vw,1.35rem)] font-bold uppercase text-[var(--app-text)]">{nowPlaying?.name || 'Nada sonando'}</p>
               <p className="truncate text-sm text-[var(--accent-primary)]">{nowPlaying?.artist || 'Abre Spotify'}</p>
-              
+
               {nowPlaying && (
                 <div className="mt-4 flex h-6 items-end gap-1">
                   {Array.from({ length: 12 }).map((_, index) => (
-                    <span
-                      key={index}
-                      className="eq-bar"
-                      style={{ height: `${4 + (index % 5) * 4}px`, animationDelay: `${index * 0.05}s` }}
-                    />
+                    <span key={index} className="eq-bar" style={{ height: `${4 + (index % 5) * 4}px`, animationDelay: `${index * 0.05}s` }} />
                   ))}
                 </div>
               )}
             </div>
           </section>
 
-          <section className="border border-[var(--app-border)] bg-[var(--app-surface)] p-6">
+          <section className="border border-[var(--app-border)] bg-[var(--app-surface)] p-5">
             <div className="mb-4 inline-flex items-center gap-2 text-[var(--accent-primary)]">
               <UilMessage size={18} />
               <p className="text-xs font-bold uppercase tracking-[0.16em]">Notificaciones</p>
             </div>
             <div className="space-y-3">
               {activities.length === 0 ? (
-                 <p className="text-xs text-[var(--app-muted)]">Sin actividad nueva.</p>
-              ) : activities.map((act, i) => (
-                 <p key={i} className="border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-xs leading-relaxed text-[var(--app-text)]">{act}</p>
-              ))}
+                <p className="text-xs text-[var(--app-muted)]">Sin actividad nueva.</p>
+              ) : (
+                activities.map((act, i) => (
+                  <p key={i} className="border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-xs leading-relaxed text-[var(--app-text)]">{act}</p>
+                ))
+              )}
             </div>
           </section>
         </aside>
       </div>
-    </section>
-  </div>
-</AppShell>
+    </AppShell>
   )
 }

@@ -229,15 +229,6 @@ export default function MainFeed() {
     }
   }, [])
 
-    const interval = setInterval(() => {
-      FeedService.getSummary()
-        .then(summary => setFriendSummary(summary))
-        .catch(e => console.warn("Could not refresh friend summary", e))
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [])
-
   return (
     <AppShell>
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-6 md:px-8 md:py-10">
